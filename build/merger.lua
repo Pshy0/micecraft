@@ -6,10 +6,12 @@ local releaseBuild = false
 
 local fileList = {
     [1] = {
-        __name = "Libraries",
-        __directory = "",
-        "1",
-		"2"
+        __name = "Head",
+        __directory = "source/init",
+        "init",
+		"module",
+		"room",
+		"env",
     }
 }
 
@@ -91,7 +93,7 @@ do
         File:write(arrayModules)
         File:close()
 
-        print("SUCCESS! Event succesfully written at " .. buildpath .. ". (" .. arrayModules:len() .. " characters)")
+        print("SUCCESS! Module succesfully written at " .. buildpath .. ". (" .. arrayModules:len() .. " characters)")
 
         -- Assert
 
@@ -99,7 +101,7 @@ do
 
         local success, code = load('require("tfmenv")\n\n' .. arrayModules, "micecraft")
         if success then
-            print("[TEST] File syntax is correct. Testing launch...")
+            print("[TEST] File syntax is correct. Testing execution...")
             local assertion, result = pcall(success)
             if assertion then
                 print("[TEST] Module executes correctly !")
