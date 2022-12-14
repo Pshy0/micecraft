@@ -12,7 +12,21 @@ local fileList = {
 		"module",
 		"room",
 		"env",
-    }
+    },
+	[2] = {
+		__name = "Utilities",
+		__directory = "source/utils",
+		"math",
+		"table",
+		"data"
+	},
+	[3] = {
+		__name = "Interface",
+		__directory = "source/interface",
+		"element",
+		"template",
+		"ui"
+	}
 }
 
 os.readFile = function(fileName)
@@ -76,21 +90,25 @@ local buildModule = function(modulo, log)
 end
 
 do
+	local build
     local arrayModules = {}
     for index, modulo in ipairs(fileList) do
         arrayModules[index] = buildModule(modulo, true)
     end
 
     arrayModules = table.concat(arrayModules, "\n")
-    
-    if releaseBuild then
-        arrayModules = arrayModules:gsub("debugMode = true", "debugMode = false")
-    end
+    do
+		local licenseFile = io.open("./LICENSE", "r")
+		local license = licenseFile:read("*all")
+		
+		build = ("--[[\n%s]]--\n%s"):format(license, arrayModules)
+		licenseFile:close()
+	end
     
     local File, result = io.open(buildpath, "w")
 
     if File then
-        File:write(arrayModules)
+        File:write(build)
         File:close()
 
         print("SUCCESS! Module succesfully written at " .. buildpath .. ". (" .. arrayModules:len() .. " characters)")
@@ -117,7 +135,6 @@ do
 	
 	if shouldLog then
 		File, result = io.open(logpath, "w")
-		print(result)
 		File:write(arrayModules)
 		File:close()
 	end
