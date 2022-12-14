@@ -99,7 +99,7 @@ do
 
         load = loadstring or load
 
-        local success, code = load('require("tfmenv")\n\n' .. arrayModules, "micecraft")
+        local success, code = load('package.path = "build/?.lua;" .. package.path\nrequire("tfmenv")\n\n' .. arrayModules, "micecraft")
         if success then
             print("[TEST] File syntax is correct. Testing execution...")
             local assertion, result = pcall(success)
