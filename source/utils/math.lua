@@ -16,20 +16,83 @@ do
 		return sqrt((bx - ax)^2 + (by - ay)^2)
 	end
 	
-	math.tobase = function(n, b)
-		n = floor(n)
-		if not b or b==10 then return tostring(n) end
-		local dg = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		local t = {}
-		local sign = n < 0 and "-" or ""
-		if sign == "-" then n = -n end
+	math.precision = function(number, precision)
+		local elevator = 10^precision
+		
+		return floor(number * elevator) / elevator
+	end
+	
+	local BASEDIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz&!"
+	
+	math.tobase = function(number, base)
+		number = floor(number)
+		
+		if not base or base == 10 then
+			return tostring(number)
+		end
+		
+		local digits = BASEDIGITS
+		local composition = {}
+		
+		local sign = (number < 0 and "-" or "")
+		if sign == "-" then
+			number = -number
+		end
 		
 		repeat
-			local d = (n%b)+1
-			n = math.floor(n/b)
-			table.insert(t, 1, dg:sub(d, d))
-		until n == 0
+			local digit = (number % base) + 1
+			number = floor(number / base)
+			table.insert(composition, 1, digits:sub(digit, digit))
+		until number == 0
 
-		return sign .. table.concat(t, "")
+		return sign .. table.concat(composition, "")
+	end
+	
+	local STRDIGITS = {}
+	for i = 1, #BASEDIGITS do
+		STRDIGITS[BASEDIGITS:sub(i, i)] = i - 1
+	end
+	
+	math.tonumber = function(str, base)
+		if base <= 36 then
+			return tonumber(str, base)
+		else
+			local number = 0
+			local len = #str
+			local value
+			for i = len, 1, -1 do
+				value = STRDIGITS[str:sub(i, i)]
+				if (not value) or (value >= base) then
+					return nil
+				else
+					number = number + ((base ^ (len - i)) * value)
+				end
+			end
+			
+			return number
+		end
 	end
 end
+
+local tc = {}
+
+--[[
+
+Compression testing
+
+math.randomseed(os.time())
+for i=1, 5 do
+	local x = 1020
+	repeat
+		local v = math.random(x)
+		tc[#tc + 1] = ("%s|%s%s"):format(math.tobase(math.random(256), 64), math.tobase(v, 64), "+")
+		
+		x = x - v
+	until x <= 0
+	
+	tc[#tc + 1] = "\n"
+end
+print(table.concat(tc, ""))
+	--"pattern: ([%W|&!]-)([%+%-])"
+]]
+	

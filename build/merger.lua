@@ -1,5 +1,5 @@
 local logpath = ("./build/log/%s.lua"):format(os.date("%Y%m%d%H%M%S"))
-local buildpath = './micecraft.lua'
+local buildpath = './build/micecraft.lua'
 
 local shouldLog = false
 local releaseBuild = false
@@ -12,6 +12,7 @@ local fileList = {
 		"module",
 		"room",
 		"env",
+		"prestart"
     },
 	[2] = {
 		__name = "Utilities",
@@ -26,6 +27,30 @@ local fileList = {
 		"element",
 		"template",
 		"ui"
+	},
+	[4] = {
+		__name = "World",
+		__directory = "source/world",
+		
+	},
+	[5] = {
+		__name = "Player",
+		__directory = "source/player",
+		"init",
+		"data"
+	},
+	[6] = {
+		__name = "Events",
+		__directory = "source/events",
+		"NewGame",
+		"NewPlayer",
+		"PlayerDataLoaded",
+		"PlayerLeft"
+	},
+	[7] = {
+		__name = "Launch",
+		__directory = "source/launch",
+		"launch"
 	}
 }
 
@@ -101,7 +126,7 @@ do
 		local licenseFile = io.open("./LICENSE", "r")
 		local license = licenseFile:read("*all")
 		
-		build = ("--[[\n%s]]--\n%s"):format(license, arrayModules)
+		build = ("--[[\n\n%s\n]]--\n%s"):format(license, arrayModules)
 		licenseFile:close()
 	end
     
@@ -111,13 +136,13 @@ do
         File:write(build)
         File:close()
 
-        print("SUCCESS! Module succesfully written at " .. buildpath .. ". (" .. arrayModules:len() .. " characters)")
+        print("SUCCESS! Module succesfully written at " .. buildpath .. ". (" .. build:len() .. " characters)")
 
         -- Assert
 
         load = loadstring or load
 
-        local success, code = load('package.path = "build/?.lua;" .. package.path\nrequire("tfmenv")\n\n' .. arrayModules, "micecraft")
+        local success, code = load('package.path = "build/?.lua;" .. package.path; require("tfmenv");' .. build, "micecraft")
         if success then
             print("[TEST] File syntax is correct. Testing execution...")
             local assertion, result = pcall(success)

@@ -1,5 +1,13 @@
-local env = { -- Default values
+local BOX2D_MAX_SIZE = 32767 -- Constant according to game limitations. Do not modify!
+local TEXTURE_SIZE = 32 -- Constant according to assets uploaded. Do not modify !
+local REFERENCE_SCALE = 1.0
+local REFERENCE_SCALE_X = 1.0
+local REFERENCE_SCALE_Y = 1.0
+
+local Env = { -- Default values
 	blockSize = 32,
+	blockHeight = 32,
+	blockWidth = 32,
 	
 	chunkSize = 256, -- width x height
 	chunkWidth = 16,
@@ -21,17 +29,21 @@ local env = { -- Default values
 	worldLeftEdge = 0,
 	worldRightEdge = 0,
 	worldUpperEdge = 0,
-	worldLowerEdge = 0
+	worldLowerEdge = 0,
+	
+	limWorldBlockWidth = math.floor(BOX2D_MAX_SIZE / 32), -- Develop further
+	limWorldBlockHeight = math.floor(BOX2D_MAX_SIZE / 32)
 }
 
-local TEXTURE_SIZE = 32 -- Constant according to assets uploaded. Do not modify !
-local REFERENCE_SCALE = 1.0
-
-function env:setVariables(blockSize, chunkWidth, chunkHeight, worldChunkRows, worldChunkLines)
+function Env:setVariables(blockSize, chunkWidth, chunkHeight, worldChunkRows, worldChunkLines)
 	-- Block
 	self.blockSize = blockSize or self.blockSize
+	self.blockWidth = self.blockSize
+	self.blockHeight = self.blockSize
 	
 	REFERENCE_SCALE = self.blockSize / TEXTURE_SIZE
+	REFERENCE_SCALE_X = self.blockWidth / TEXTURE_SIZE
+	REFERENCE_SCALE_Y = self.blockHeight / TEXTURE_SIZE
 	
 	-- Chunk
 	
@@ -47,11 +59,11 @@ function env:setVariables(blockSize, chunkWidth, chunkHeight, worldChunkRows, wo
 	
 	self.worldSize = (self.worldChunkRows * self.worldChunkLines) * self.chunkSize
 	
-	self.worldPixelWidth = self.blockSize * (self.chunkWidth * self.worldChunkRows)
-	self.worldPixelHeight = self.blockSize * (self.chunkHeight * self.worldChunkLines)
+	self.worldPixelWidth = math.min(BOX2D_MAX_SIZE, self.blockWidth * (self.chunkWidth * self.worldChunkRows))
+	self.worldPixelHeight = math.min(BOX2D_MAX_SIZE, self.blockHeight * (self.chunkHeight * self.worldChunkLines))
 	
-	self.worldHorizontalOffset = 0
-	self.worldVerticalOffset = 0
+	self.worldHorizontalOffset = math.min(0, BOX2D_MAX_SIZE - self.worldPixelWidth)
+	self.worldVerticalOffset = math.min(0, BOX2D_MAX_SIZE - self.worldPixelHeight)
 	
 	self.worldLeftEdge = self.worldHorizontalOffset
 	self.worldRightEdge = self.worldHorizontalOffset + self.worldPixelWidth
@@ -61,6 +73,22 @@ function env:setVariables(blockSize, chunkWidth, chunkHeight, worldChunkRows, wo
 	
 end
 
-function env:getEdges()
+function Env:getBlockDimensions()
+	return self.blockWidth, self.blockHeight, self.blockSize
+end
+
+function Env:getChunkDimensions()
+	return self.chunkWidth, self.chunkHeight, self.chunkSize
+end
+
+function Env:getWorldBlocks()
+	return self.worldChunkRows * self.chunkWidth, self.worldChunkLines * self.chunkHeight
+end
+
+function Env:getWorldChunks()
+	return self.worldChunkRows, self.worldChunkLines
+end
+
+function Env:getEdges()
 	return self.worldLeftEdge, self.worldRightEdge, self.worldUpperEdge, self.worldLowerEdge
 end

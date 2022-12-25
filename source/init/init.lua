@@ -1,3 +1,5 @@
+local LOCAL_EPOCH = os.time()
+
 local bit32, coroutine, math, os, string, table = _G.bit32, _G.coroutine, _G.math, _G.os, _G.string, _G.table
 local debug, system, tfm, ui = _G.debug, _G.system, _G.tfm, _G.ui
 
@@ -10,15 +12,25 @@ end
 
 math.randomseed(os.time())
 
+-- We don't want globals in our code. They pollute the global environment,
+-- are prone to cause memory leaks on the Lua VM, make debugging harder,
+-- and increases unnecesarily the table acceses. Only Transformice events
+-- should be globals, because that's the only way we can receive callbacks.
 setmetatable(_G, {
 	__newindex = function(self, k, v)
-		if not k:find("^event") then
-			error(("NO GLOBALS ALLOWED !! Bad global: %s"):format(tostring(k)))
+		if k:match("^event") then -- It's an Event (duh)
+			rawset(_G, k, v)
+		else -- Not an Event. Bad global.
+			error(("NO GLOBALS ALLOWED !! Bad global: %q >:("):format(tostring(k)), 2)
 		end
 	end
 })
 
 local xmlLoad = '<C><P Ca="" H="%d" L="%d" /><Z><S></S><D><DS X="%d" Y="%d" /></D><O /></Z></C>'
+
+local Module = {}
+local Room = {}
+
 
 local Block = {}
 local Chunk = {}

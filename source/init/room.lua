@@ -4,11 +4,11 @@ function Room:init()
 	self.language = this.language
 	self.isTribe = this.isTribeHouse
 	self.fullName = this.name
-	self.isPrivate = this.name:match("^@")
+	self.isPrivate = (this.name:sub(1, 1) == "@") or this.passwordProtected--this.name:match("^@")
 	
 	self.args = {}
 	do
-		for arg in self.fullName:gmatch("[^%d%s]") do
+		for arg in self.fullName:gmatch("[^%d%s]+") do
 			table.insert(self.args, arg)
 		end
 		
@@ -22,20 +22,32 @@ function Room:init()
 	
 	self.playerList = {}
 	for playerName, playerData in next, this.playerList do
-		self:newPlayer(playerName)
+		eventNewPlayer(playerName)
 	end
 end
 
+function Room:hasPlayer(playerName)
+	return not not self.playerList[playerName]
+end
+
+function Room:getPlayer(playerName)
+	return self.playerList[playerName]
+end
+
 function Room:newPlayer(playerName)
-	if not self.playerList[playerName] then
+	if not self:hasPlayer(playerName) then
 		self.playerList[playerName] = Player.new(playerName)
+		
+		self:getPlayer(playerName):loadData()
 		
 		self.activePlayers = self.activePlayers + 1
 	end
 end
 
 function Room:playerLeft(playerName)
-	if self.playerList[playerName] then
+	if self:hasPlayer(playerName) then
+		self:getPlayer(playerName):saveData()	
+		
 		self.playerList[playerName] = nil
 		
 		self.activePlayers = self.activePlayers - 1

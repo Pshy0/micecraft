@@ -59,21 +59,43 @@ do
 		end
 	end
 	
-	table.tostring = function(value, tb)
+	table.random = function(t)
+		return t[math.random(#t)]
+	end
+	
+	table.keys = function(t)
+		local array = {}
+		
+		for k, v in next, t do
+			array[#array + 1] = k
+		end
+		
+		return array
+	end
+	
+	table.tostring = function(value, tb, seen)
+		tb = tb or 0
+		if tb > 8 then return end
+		
 		local tv = type(value)
 		if tv == "table" then
-			tb = tb or 0			
+			seen = seen or {}
+						
 			local args = {}
-			local vv
-			
+			local kk, vv
+			local p1 = tb + 1
 			for k, v in next, value do
-				if type(v) == "table" and tostring(k):match("^__") then
-					vv = "{...}"
-				else
-					vv = table.tostring(v, tb + 1)
+				kk = table.tostring(k, p1)
+				if not seen[v] then
+					if type(v) == "table" then
+						seen[v] = true
+						vv = table.tostring(v, p1, seen)
+					else
+						vv = table.tostring(v, tb + 1, seen)
+					end
+					
+					args[#args + 1] = ("%s%s"):format(("\t"):rep(p1), ("[%s] = %s"):format(kk, vv))
 				end
-				
-				args[#args + 1] = ("%s%s"):format(("\t"):rep(tb + 1), ("[%s] = %s"):format(k, vv))
 			end
 			
 			table.sort(args, function(a, b)
@@ -103,9 +125,6 @@ do
 	end
 	
 	table.print = function(t)
-		print(table.tostring(t, 0))		
-	end
-	
-	end
-	
+		print(table.tostring(t, 0))
+	end	
 end

@@ -57,10 +57,10 @@ end
 data.parse = function(str, depth)
 	local booleans = {
 		["+"] = true,
-		["-"] = false
+		["-"] = true
 	}
-	if booleans[str] ~= nil then
-		return booleans[str]
+	if booleans[str] then
+		return (str == '+')
 	end
 	
 	local value = str:match('^"(.-)"$')
@@ -71,7 +71,7 @@ data.parse = function(str, depth)
 		if value then
 			return data.decode(value, depth + 1)
 		else
-			return tonumber(str) or str
+			return math.tonumber(str, 64) or str
 		end
 	end
 end
@@ -87,7 +87,7 @@ data.serialize = function(this, depth)
 		value = ("{%s}"):format(table.concat(concat, string.char(17 + depth)))
 	else
 		if type(this) == "number" then
-			value = tostring(this)
+			value = math.tobase(this, 64)
 		elseif type(this) == "boolean" then
 			value = this and "+" or "-"
 		elseif type(this) == "string" then
@@ -105,7 +105,7 @@ data.encode = function(this, depth)
 	local k, v
 	for key, value in next, this do
 		k, v = key, data.serialize(value, depth + 1)
-		str[#str + 1] = ("%s=%s"):format(k, v)
+		str[#str + 1] = ("%s=%s"):format(k, v) -- Pending: optimize for numeric arrays (test use of ("%s"):format(v))
 	end
 	
 	return table.concat(str, separator)
