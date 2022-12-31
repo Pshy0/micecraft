@@ -12,6 +12,7 @@ local fileList = {
 		"module",
 		"room",
 		"env",
+		"enum",
 		"prestart"
     },
 	[2] = {
@@ -31,15 +32,26 @@ local fileList = {
 	[4] = {
 		__name = "World",
 		__directory = "source/world",
-		
+		"init"
 	},
 	[5] = {
+		__name = "Block",
+		__directory = "source/block",
+		"init",
+		"graphics"
+	},
+	[6] = {
+		__name = "Chunk",
+		__directory = "source/chunk",
+		"init"
+	},
+	[7] = {
 		__name = "Player",
 		__directory = "source/player",
 		"init",
 		"data"
 	},
-	[6] = {
+	[8] = {
 		__name = "Events",
 		__directory = "source/events",
 		"NewGame",
@@ -47,7 +59,7 @@ local fileList = {
 		"PlayerDataLoaded",
 		"PlayerLeft"
 	},
-	[7] = {
+	[9] = {
 		__name = "Launch",
 		__directory = "source/launch",
 		"launch"
@@ -97,18 +109,18 @@ local buildModule = function(modulo, log)
         end
     end
 
-    arrayFiles = table.concat(arrayFiles, "\n") or ""
+    local filesComp = table.concat(arrayFiles, "\n") or ""
 
     if log then
-        print(("[MODULE] '%s' has been built (%d characters).\n"):format(modulo.__name, #arrayFiles))
+        print(("[MODULE] '%s' has been built (%d characters).\n"):format(modulo.__name, #filesComp))
     end
 	
     local Module
 
     if releaseBuild then
-        Module = arrayFiles
+        Module = filesComp
     else
-        Module = ("-- %s\t%s\t%s --\n\n %s"):format(("="):rep(7), modulo.__name, ("="):rep(7), arrayFiles)
+        Module = ("-- %s\t%s\t%s --\n\n %s"):format(("="):rep(7), modulo.__name, ("="):rep(7), filesComp)
     end
 
     return Module
@@ -121,13 +133,15 @@ do
         arrayModules[index] = buildModule(modulo, true)
     end
 
-    arrayModules = table.concat(arrayModules, "\n")
+    local compModules = table.concat(arrayModules, "\n")
     do
 		local licenseFile = io.open("./LICENSE", "r")
-		local license = licenseFile:read("*all")
-		
-		build = ("--[[\n\n%s\n]]--\n%s"):format(license, arrayModules)
-		licenseFile:close()
+        if licenseFile then
+            local license = licenseFile:read("*all")
+            
+            build = ("--[[\n\n%s\n]]--\n%s"):format(license, compModules)
+            licenseFile:close()
+        end
 	end
     
     local File, result = io.open(buildpath, "w")
@@ -160,7 +174,9 @@ do
 	
 	if shouldLog then
 		File, result = io.open(logpath, "w")
-		File:write(arrayModules)
-		File:close()
+        if File then
+            File:write(arrayModules)
+            File:close()
+        end
 	end
 end

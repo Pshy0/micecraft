@@ -52,6 +52,9 @@ function Env:setVariables(blockSize, chunkWidth, chunkHeight, worldChunkRows, wo
 	
 	self.chunkSize = self.chunkWidth * self.chunkHeight
 	
+	self.chunkPixelWidth = self.chunkWidth * self.blockWidth
+	self.chunkPixelHeight = self.chunkHeight * self.blockHeight
+	
 	-- World
 	
 	self.worldChunkRows = worldChunkRows or self.worldChunkRows
@@ -78,6 +81,10 @@ function Env:getBlockDimensions()
 end
 
 function Env:getChunkDimensions()
+	return self.chunkPixelWidth, self.chunkPixelHeight
+end
+
+function Env:getChunkPixelDimensions()
 	return self.chunkWidth, self.chunkHeight, self.chunkSize
 end
 
@@ -90,5 +97,5 @@ function Env:getWorldChunks()
 end
 
 function Env:getEdges()
-	return self.worldLeftEdge, self.worldRightEdge, self.worldUpperEdge, self.worldLowerEdge
+	return self.worldLeftEdge, self.worldUpperEdge, self.worldRightEdge, self.worldLowerEdge
 end

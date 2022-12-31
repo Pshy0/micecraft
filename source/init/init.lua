@@ -18,22 +18,28 @@ math.randomseed(os.time())
 -- should be globals, because that's the only way we can receive callbacks.
 setmetatable(_G, {
 	__newindex = function(self, k, v)
-		if k:match("^event") then -- It's an Event (duh)
+		if k:match("^event.+") then -- It's an Event (duh)
 			rawset(_G, k, v)
-		else -- Not an Event. Bad global.
+		else -- Not an Event. Bad global !!
 			error(("NO GLOBALS ALLOWED !! Bad global: %q >:("):format(tostring(k)), 2)
 		end
 	end
 })
-
+--		ALT:	'<C><P Ca="" H="%d" L="%d" /><Z><S></S><D><T X="%d" Y="%d" D="" /></D><O /></Z></C>'
 local xmlLoad = '<C><P Ca="" H="%d" L="%d" /><Z><S></S><D><DS X="%d" Y="%d" /></D><O /></Z></C>'
 
 local Module = {}
 local Room = {}
 
+local Modes = {}
+local Mode = {}
+
+local enum = {}
 
 local Block = {}
 local Chunk = {}
 local World = {}
 
 local Player = {}
+
+local ticks = 0

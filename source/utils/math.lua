@@ -73,26 +73,4 @@ do
 		end
 	end
 end
-
-local tc = {}
-
---[[
-
-Compression testing
-
-math.randomseed(os.time())
-for i=1, 5 do
-	local x = 1020
-	repeat
-		local v = math.random(x)
-		tc[#tc + 1] = ("%s|%s%s"):format(math.tobase(math.random(256), 64), math.tobase(v, 64), "+")
-		
-		x = x - v
-	until x <= 0
-	
-	tc[#tc + 1] = "\n"
-end
-print(table.concat(tc, ""))
-	--"pattern: ([%W|&!]-)([%+%-])"
-]]
 	

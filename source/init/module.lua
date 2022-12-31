@@ -348,3 +348,26 @@ end
 function Module:getDebugInfo(asText)
 	
 end
+
+function Module:setSync(playerName) -- Seeks for the player with the lowest latency for syncing.
+	if playerName then
+		if not Room:hasPlayer(playerName) then
+			playerName = nil
+		end
+	end
+	
+	if not playerName then
+		local candidate, bestLatency = "", 99e99
+		
+		for playerName, player in next, tfm.get.room.playerList do
+			if player.averageLatency <= bestLatency then
+				bestLatency = player.averageLatency
+				candidate = playerName
+			end
+		end
+		
+		playerName = candidate
+	end
+	
+	tfm.exec.setPlayerSync(playerName)
+end
