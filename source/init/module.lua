@@ -18,6 +18,8 @@ function Module:init(apiVersion, tfmVersion)
 	self.runtimeLimit = 52
 	
 	self.isPaused = false
+	
+	self.args = {}
 end
 
 --- Asserts if API version matches the defined version for this Module.
@@ -82,13 +84,12 @@ function Module:throwException(fatal, errorMessage, ...) -- To do
 	if fatal then
 		self:onError(errorMessage, ...)
 	else
-		tfm.exec.chatMessage(errorMessage)
+		self:emitWarning(1, errorMessage)
 	end
 end
 
 
 local Event = {}
-Event.__index = Event
 
 do
 	local nativeEvents = {
@@ -120,20 +121,22 @@ do
 		["TextAreaCallback"] = true,
 		["TalkToNPC"] = true
 	}
-	function Event.new(eventName)
-		local self = setmetatable({}, Event)
+	function Event:new(eventName)
+		local this = setmetatable({
+			keyName = eventName,
+			isNative = nativeEvents[eventName],
+			calls = {}
+		}, self)
+
+		this.__index = self
 		
-		self.keyName = eventName
-		self.isNative = nativeEvents[eventName]
-		self.calls = {}
-		
-		if self.isNative then
-			self.trigger = Event.triggerCount
+		if this.isNative then
+			this.trigger = Event.triggerCount
 		else
-			self.trigger = Event.triggerUncount
+			this.trigger = Event.triggerUncount
 		end
 		
-		return self
+		return this
 	end
 end
 
@@ -250,7 +253,7 @@ do
 	--- Triggers the callbacks of an event emmited.
 	-- This function should not be called other than inside a true event
 	-- definition. For the sake of performance, it assumes that the event
-	-- provided already exists, and thus doesn't check for a nil returned.
+	-- provided already exists, and thus doesn't check for a nil listener.
 	-- @param eventName The event to trigger.
 	-- @return `Boolean` Whether the Event triggered without errors.
 	function Module:trigger(eventName, ...)
@@ -278,6 +281,8 @@ function Module:increaseRuntime(increment)
 		
 		return true
 	end
+	
+	return false
 end
 
 --- Triggers a Module Pause.
@@ -357,7 +362,7 @@ function Module:setSync(playerName) -- Seeks for the player with the lowest late
 	end
 	
 	if not playerName then
-		local candidate, bestLatency = "", 99e99
+		local candidate, bestLatency = "", math.huge
 		
 		for playerName, player in next, tfm.get.room.playerList do
 			if player.averageLatency <= bestLatency then
@@ -370,4 +375,40 @@ function Module:setSync(playerName) -- Seeks for the player with the lowest late
 	end
 	
 	tfm.exec.setPlayerSync(playerName)
+end
+
+function Module:newMode(modeName, constructor)
+	self.modeList[modeName] = Mode:new(modeName, constructor)
+end
+
+function Module:getMode(modeName)
+	modeName = modeName or self.subMode
+	return self.modeList[modeName] or self.modeList[modeName:lower()]
+end
+
+function Module:hasMode(modeName)
+	return not not self:getMode(modeName or "")
+end
+
+do
+	local rawget = rawget
+	local rawset = rawset
+	function Module:setMode(modeName)
+		local mode = self:getMode(modeName) or self:getMode("default")
+		
+		if mode then
+			mode:constructor({ -- Proxy table
+				__index = function(t, k)
+					return rawget(mode.environment, k)
+				end,
+				__newindex = function(t, k, v)
+					rawset(mode.environment, k, v)
+				end
+			})
+		
+			self.settings = mode:getSettings()
+		end
+		
+		return mode
+	end
 end

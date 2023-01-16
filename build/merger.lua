@@ -6,14 +6,9 @@ local releaseBuild = false
 
 local fileList = {
     [1] = {
-        __name = "Head",
+        __name = "Init",
         __directory = "source/init",
         "init",
-		"module",
-		"room",
-		"env",
-		"enum",
-		"prestart"
     },
 	[2] = {
 		__name = "Utilities",
@@ -23,35 +18,47 @@ local fileList = {
 		"data"
 	},
 	[3] = {
+		__name = "Head",
+		__directory = "source/init",
+		"module",
+		"room",
+		"env",
+		"enum",
+		"prestart"
+	},
+	[4] = {
 		__name = "Interface",
 		__directory = "source/interface",
 		"element",
 		"template",
 		"ui"
 	},
-	[4] = {
+	[5] = {
 		__name = "World",
 		__directory = "source/world",
-		"init"
+		"init",
+		"interaction",
+		"generation",
+		"encoding"
 	},
-	[5] = {
+	[6] = {
 		__name = "Block",
 		__directory = "source/block",
 		"init",
 		"graphics"
 	},
-	[6] = {
+	[7] = {
 		__name = "Chunk",
 		__directory = "source/chunk",
 		"init"
 	},
-	[7] = {
+	[8] = {
 		__name = "Player",
 		__directory = "source/player",
 		"init",
 		"data"
 	},
-	[8] = {
+	[9] = {
 		__name = "Events",
 		__directory = "source/events",
 		"NewGame",
@@ -59,7 +66,7 @@ local fileList = {
 		"PlayerDataLoaded",
 		"PlayerLeft"
 	},
-	[9] = {
+	[10] = {
 		__name = "Launch",
 		__directory = "source/launch",
 		"launch"

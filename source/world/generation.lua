@@ -1,5 +1,5 @@
 function World:preSetLayer(layer, heightMap)
-	local width, height = Env:getWorldBlocks()
+	local width, height = self:getBlocks()
 	local dir = layer.dir
 	local overwrite = layer.overwrite
 	local isExclusive = layer.exclusive
@@ -41,7 +41,7 @@ function World:preSetHeightMap(mapInfo)
 	
 	local pre = self.pre
 	
-	local width, height = Env:getWorldBlocks()
+	local width, height = self:getBlocks()
 	
 	local xs = mapInfo.xStart or 1 -- X Start
 	local xe = mapInfo.xEnd or math.min(xs + #heightMap, width) -- X End
@@ -91,7 +91,7 @@ function World:preSetNoiseMap(mapInfo)
 	
 	local pre = self.pre
 	
-	local width, height = Env:getWorldBlocks()
+	local width, height = self:getBlocks()
 	
 	local xs = math.range(dir.xStart or 1, 1, width)
 	local xe = math.range(dir.xEnd or width, 1, width)

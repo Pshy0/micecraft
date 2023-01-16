@@ -1,29 +1,33 @@
-function Player.new(playerName)
-	local self = setmetatable({}, Player)
-	local this = tfm.get.room.playerList[playerName]
+function Player:new(playerName)
+	local info = tfm.get.room.playerList[playerName]
 	
-	self.name = playerName
+	local this = setmetatable({
+		name = playerName,
+		
+		language = info.language,
+		
+		x = 0,
+		y = 0,
+		
+		vx = 0,
+		vy = 0,
+		
+		isMoving = false,
+		isJumping = false,
+		isFacingRight = true,
+		
+		isAlive = false,
+		isBanned = false,
+		
+		keys = {}
+		
+		dataFile = "",
+		awaitingData = false
+	}, self)
+
+	this.__index = self
 	
-	self.language = this.language
-	
-	self.x = 0
-	self.y = 0
-	self.vx = 0
-	self.vy = 0
-	
-	self.isMoving = false
-	self.isJumping = false
-	self.isFacingRight = true
-	
-	self.isAlive = false
-	self.isBanned = false
-	
-	self.keys = {}
-	
-	self.dataFile = ""
-	self.awaitingData = false
-	
-	return self
+	return this
 end
 
 function Player:init()
@@ -47,6 +51,6 @@ function Player:init()
 	end
 end
 
-function Player:assertValidity() -- TO do
+function Player:assertValidity() -- To Do
 	return not self.isBanned
 end

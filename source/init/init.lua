@@ -31,15 +31,23 @@ local xmlLoad = '<C><P Ca="" H="%d" L="%d" /><Z><S></S><D><DS X="%d" Y="%d" /></
 local Module = {}
 local Room = {}
 
-local Modes = {}
 local Mode = {}
 
 local enum = {}
 
 local Block = {}
+Block.__index = Block
 local Chunk = {}
+Chunk.__index = Chunk
 local World = {}
 
 local Player = {}
+Player.__index = Player
 
 local ticks = 0
+
+local BOX2D_MAX_SIZE = 32767 -- Constant according to game limitations. Do not modify!
+local TEXTURE_SIZE = 32 -- Constant according to assets uploaded. Do not modify !
+local REFERENCE_SCALE = 1.0
+local REFERENCE_SCALE_X = 1.0
+local REFERENCE_SCALE_Y = 1.0

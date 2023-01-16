@@ -1,112 +1,153 @@
 local data = {}
 
-do
-	local xCHAR = string.char(17)
-	data.getFromModule = function(str, MODULE)
+do -- Localize variables to reduce workload
+	local type = type
+	local ipairs, pairs, next = ipairs, pairs, next
+	local concat = table.concat
+	local char = string.char
+	
+	local xCHAR = char(17)
+	
+	--- Gives the specific data of a module from an encoded string.
+	-- @param str The data to search into
+	-- @param m_id The module identificator
+	-- @return `String` The raw data for this module, otherwise an empty string.
+	data.getFromModule = function(str, m_id)
 		
-		local rawdata = str:match(("%s (.-)%s"):format(MODULE or "", xCHAR))
+		local rawdata = str:match(("%s (.-)%s"):format(m_id or "", xCHAR))
 		if rawdata and rawdata ~= ("") then
 			return rawdata
 		else
-			print(("Could not find data for module '%s'"):format(MODULE))
+			print(("Could not find data for module '%s'"):format(m_id))
 		end
 		
 		return ""
 	end
-
-	data.setToModule = function(str, MODULE, rawdata)
-		local pattern = ("%s (.-)%s"):format(MODULE or "", xCHAR)
+	
+	--- Sets the data to the specified module on an encoded string
+	-- @param str The complete raw data
+	-- @param m_id The module identifier
+	-- @param rawdata The raw data to apply to the specified module
+	-- @return `String` The new encoded data
+	-- @return `String` The new raw data for the module
+	-- @return `String` The old encoded data
+	-- @return `String` The old raw data for the module
+	data.setToModule = function(str, m_id, rawdata)
+		local pattern = ("%s (.-)%s"):format(m_id or "", xCHAR)
 		local oldModuleData = str:match(pattern)
 		local newData
 		
-		local newstr = ("%s %s%s"):format(MODULE, rawdata, xCHAR)
+		local newstr = ("%s %s%s"):format(m_id, rawdata, xCHAR)
 		
 		if oldModuleData then
 			newData = str:gsub(pattern, newstr)
 		else
-			if MODULE then
+			if m_id then
 				newData = ("%s%s"):format(str, newstr)
 			end
 		end
 		
 		return newData, rawdata, str, oldModuleData
 	end
-end
-
-data.decode = function(str, depth)
-	depth = depth or 1
-	local this = {}
-	local count = 1
-
-	local pattern = "[^" .. string.char(17 + depth) .. "]+"
 	
-	local key, value
-	for INFO in str:gmatch(pattern) do
-		key, value = INFO:match("(%w+)=(.+)")
-		if not key then
-			key = count
-			value = INFO
-			count = count + 1
+	--- Decodes a piece of raw data.
+	-- @param str The raw data
+	-- @param depth The depth to look at, in case it's a table.
+	-- @return `Table` The table with the data.
+	data.decode = function(str, depth)
+		depth = depth or 1
+		local this = {}
+		local count = 1
+
+		local pattern = "[^" .. char(17 + depth) .. "]+"
+		
+		local key, value
+		for info in str:gmatch(pattern) do
+			key, value = info:match("(%w+)=(.+)")
+			if not key then
+				key = count
+				value = info
+				count = count + 1
+			end
+			this[key] = data.parse(value or "", depth)
 		end
-		this[key] = data.parse(value or "", depth)
+		
+		return this
 	end
-	
-	return this
-end
 
-data.parse = function(str, depth)
-	local booleans = {
-		["+"] = true,
-		["-"] = true
-	}
-	if booleans[str] then
-		return (str == '+')
-	end
-	
-	local value = str:match('^"(.-)"$')
-	if value then
-		return value
-	else
-		value = str:match("^{(.-)}$")
+	--- Parses a value encoded or compressed.
+	-- @param str The encoded data.
+	-- @param depth The deep to look at, in case it's a Table
+	-- @return `Any` The value decoded.
+	data.parse = function(str, depth)
+		local booleans = {
+			["+"] = true,
+			["-"] = true
+		}
+		if booleans[str] then
+			return (str == '+')
+		end
+		
+		local value = str:match('^"(.-)"$')
 		if value then
-			return data.decode(value, depth + 1)
+			return value
 		else
-			return math.tonumber(str, 64) or str
+			value = str:match("^{(.-)}$")
+			if value then
+				return data.decode(value, depth + 1)
+			else
+				return math.tonumber(str, 64) or str
+			end
 		end
 	end
-end
 
-data.serialize = function(this, depth)
-	local value = ""
-	depth = depth or 0
-	if type(this) == "table" then
-		local concat = {}
-		for k, v in next, this do
-			concat[#concat + 1] = data.serialize(v, depth + 1)
+	--- Encondes a value into a reasonable format.
+	-- @param this The value to convert
+	-- @param depth The depth to encode at, in case it's a table
+	-- @return `String` The value encoded.
+	data.serialize = function(this, depth)
+		local value = ""
+		depth = depth or 0
+		if type(this) == "table" then
+			local concat = {}
+			for k, v in next, this do
+				concat[#concat + 1] = data.serialize(v, depth + 1)
+			end
+			value = ("{%s}"):format(concat(concat, char(17 + depth)))
+		else
+			if type(this) == "number" then
+				value = math.tobase(this, 64)
+			elseif type(this) == "boolean" then
+				value = this and "+" or "-"
+			elseif type(this) == "string" then
+				value = ('"%s"'):format(this)
+			end
 		end
-		value = ("{%s}"):format(table.concat(concat, string.char(17 + depth)))
-	else
-		if type(this) == "number" then
-			value = math.tobase(this, 64)
-		elseif type(this) == "boolean" then
-			value = this and "+" or "-"
-		elseif type(this) == "string" then
-			value = ('"%s"'):format(this)
-		end
+		
+		return value
 	end
 	
-	return value
-end
-
-data.encode = function(this, depth)
-	depth = depth or 1
-	local separator = string.char(17 + depth)
-	local str = {}
-	local k, v
-	for key, value in next, this do
-		k, v = key, data.serialize(value, depth + 1)
-		str[#str + 1] = ("%s=%s"):format(k, v) -- Pending: optimize for numeric arrays (test use of ("%s"):format(v))
+	--- Encodes a table into a reasonable format.
+	-- @param this The table to encode
+	-- @param depth The depth to encode at (by default it's 1)
+	-- @return `String` The encoded table
+	data.encode = function(this, depth)
+		depth = depth or 1
+		local separator = char(17 + depth)
+		local str = {}
+		local k, v
+		
+		local numeric = (#this > 0)
+		for key, value in next, this do
+			k, v = key, data.serialize(value, depth + 1)
+			
+			if numeric and type(key) == "number" then
+				str[#str + 1] = v
+			else
+				str[#str + 1] = ("%s=%s"):format(k, v)
+			end
+		end
+		
+		return concat(str, separator)
 	end
-	
-	return table.concat(str, separator)
 end

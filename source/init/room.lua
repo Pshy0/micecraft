@@ -1,18 +1,45 @@
 function Room:init()
 	local this = tfm.get.room
 	
+	self.mode = nil
+	self.worldSeed = 0
 	self.language = this.language
 	self.isTribe = this.isTribeHouse
 	self.fullName = this.name
 	self.isPrivate = (this.name:sub(1, 1) == "@") or this.passwordProtected--this.name:match("^@")
+	
+	self.isFunCorp = false
 	
 	self.args = {}
 	do
 		for arg in self.fullName:gmatch("[^%d%s]+") do
 			table.insert(self.args, arg)
 		end
+	
 		
-		table.remove(self.args, 1)
+		if #self.args >= 1 then
+			if self.args[1]:find("#micecraft", 1, true) then
+				self.mode = self.args[2] or "default"
+			
+				if #self.args == 1 then
+					self.worldSeed = enum.community
+				else
+					self.worldSeed = tonumber(self.fullName:match("#micecraft(%d+)") or os.time()
+				end
+			else
+				if self.isTribe then
+					self.mode = self.fullName
+					self.isFunCorp = false
+				else
+					self.isFunCorp = true
+					self.mode = "funcorp"
+				end
+				
+				self.worldSeed = 0
+			end
+		else
+			Module:unload()
+		end
 	end
 	
 	self.totalPlayers = 0

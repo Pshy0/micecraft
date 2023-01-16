@@ -1,20 +1,5 @@
-do
-	local associate = function(t)
-		local it = {}
-		
-		for k, v in next, t do
-			it[k] = v
-			it[v] = k
-		end
-		
-		t = it
-		
-		return t
-	end
-end
-
 enum.community = { -- Based on Forum codes. Affects on nothing.
-	-- Community 0 is just player's community
+	-- Community 0 is just current player community
 	["xx"] = 1,
 	["int"] = 1, -- International  (all of them)
 	["fr"] = 2, -- French
@@ -35,7 +20,7 @@ enum.community = { -- Based on Forum codes. Affects on nothing.
 	["ph"] = 17, -- Phillipines / Tagalog (need to check code)
 	["lt"] = 18, -- Lituanian
 	["jp"] = 19,
-	-- Community 20 is INT, but only Public
+	-- Community 20 is INT, but only Public INT
 	["fi"] = 21, -- Finnish
 	["cz"] = 22, -- Czech
 	["sl"] = 23, -- Probably Slovakia (need to check code)
@@ -48,3 +33,44 @@ enum.community = { -- Based on Forum codes. Affects on nothing.
 	["az"] = 30, -- Azerbaiyan
 	["pt"] = 31 -- Portuguese (had BR flag, but `technically` they're different communities)
 }
+
+enum.category = {
+	sand = 1,
+	dirt = 2,
+	weak = 3,
+	wood = 4,
+	rock = 5,
+	wool = 6,
+	crystal = 7,
+	water = 8,
+	lava = 9
+}
+
+enum.physics = {
+	rectangle = 1, -- Searches for the biggest rectangle
+	line = 2, -- Searches vertically, for the largest set of blocks within the same line
+	row = 3, -- Same as line, but horizontally
+	rectangle_detailed = 4, -- Takes into account block's categories
+	line_detailed = 5, -- ^
+	row_detailed = 6, -- ^
+	individual = 10 -- Each block has its individual collision (not recommended)
+}
+
+do
+	local associate = function(t)
+		local it = {}
+		
+		for k, v in next, t do
+			it[k] = v
+			it[v] = k
+		end
+		
+		t = it
+		
+		return t
+	end
+	
+	enum.community = associate(enum.community)
+	enum.category = associate(enum.category)
+	enum.physics = associate(enum.physics)
+end

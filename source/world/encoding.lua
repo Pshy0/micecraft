@@ -1,5 +1,5 @@
 function World:decodeMatrix(raw)
-	local height, width = Env:getWorldBlocks()
+	local height, width = self:getBlocks()
 	
 	local matrix = {{}}
 	
@@ -9,7 +9,7 @@ function World:decodeMatrix(raw)
 	for line in raw:gmatch("%S+") do
 		y = y + 1
 		matrix[y] = {}
-		for order, status in line:gmatch("([%w|&!]-)([%+%-])") do -- Match for: c2|W+ or 1-
+		for order, status in line:gmatch("([%w|&!]-)([%+%-])") do -- Match for "A|B+" (block [A] repeats for [B] times) or "A-" (just block [A])
 			tangible = (status == "+")
 			if order:find("|", 1, true) then
 				type, repeats = order:match("^([%w&!]-)|([%w&!]-)$")
