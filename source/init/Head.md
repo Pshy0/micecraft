@@ -1,4 +1,4 @@
-### **_G.__newindex** ( Table:`self`, Any:`k`, Any:`v` )
+### **_G.__newindex** ( `self`: table, `k`: any, `v`: any )
 Crashes on the slightlest sign of a global. We don't want globals in our code. They pollute the global environment, are prone to cause memory leaks on the Lua VM, make debugging harder, and increases unnecessarily the table acceses. Only Transformice events should be globals, because that's the only way callbacks can be received.
 
 
@@ -9,7 +9,7 @@ Crashes on the slightlest sign of a global. We don't want globals in our code. T
 
 ---
 
-### **Module:init** ( Unknown:`apiVersion`, Unknown:`tfmVersion` )
+### **Module:init** ( `apiVersion`: unknown, `tfmVersion`: unknown )
 Initializes the Module. This function creates the table for the event list, the registers of runtime and may be used to verify various other things. It should only be called on pre-start, because it doesn't check if previous values already exist, and may delete all of them.
 
 
@@ -19,7 +19,7 @@ Initializes the Module. This function creates the table for the event list, the 
 
 ---
 
-### **Module:assertVersion** ( Unknown:`apiVersion`, Unknown:`tfmVersion` )
+### **Module:assertVersion** ( `apiVersion`: unknown, `tfmVersion`: unknown )
 Asserts if API version matches the defined version for this Module. In case it doesn't, a warning will be displayed for players to inform the developer. 
 
 
@@ -33,7 +33,7 @@ Asserts if API version matches the defined version for this Module. In case it d
 
 ---
 
-### **Module:emitWarning** ( Int:`severity`, String:`message` )
+### **Module:emitWarning** ( `severity`: int, `message`: string )
 Emits a warning, as a message on chat, with the issue provided. 
 
 
@@ -43,7 +43,7 @@ Emits a warning, as a message on chat, with the issue provided.
 
 ---
 
-### **Module:unload** ( Boolean:`handled` )
+### **Module:unload** ( `handled`: boolean )
 Triggers an exit of the proccess. It should only be called on special situations, as a server restart or a module crash. It will automatically save all the data that needs to be saved, in case the unload is 'handled'.
 
 
@@ -52,7 +52,7 @@ Triggers an exit of the proccess. It should only be called on special situations
 
 ---
 
-### **Module:onError** ( String:`errorMessage`, Any:`...` )
+### **Module:onError** ( `errorMessage`: string, `...`: any )
 Callback when the Module crashes for any error. Save data
 
 
@@ -62,7 +62,7 @@ Callback when the Module crashes for any error. Save data
 
 ---
 
-### **Module:throwException** ( Boolean:`fatal`, String:`errorMessage`, Any:`...` )
+### **Module:throwException** ( `fatal`: boolean, `errorMessage`: string, `...`: any )
 Throws an exception report. The exception can either be fatal or not, and the handling of the Module against that exception will change accordingly. To do
 
 
@@ -73,7 +73,7 @@ Throws an exception report. The exception can either be fatal or not, and the ha
 
 ---
 
-### **Module:on** ( String:`eventName`, Function:`callback` )
+### **Module:on** ( `eventName`: string, `callback`: function )
 Creates a callback to trigger when an Event is emmited. In case the Event exists, it will append the callback to the internal list of the Event, so every callback will be executed on the order it is defined. Otherwise it doesn't exist, an Event object will be created, and the Event will be defined on the Global Space.
 
 
@@ -88,7 +88,7 @@ Creates a callback to trigger when an Event is emmited. In case the Event exists
 
 ---
 
-### **Module:addEvent** ( String:`eventName` )
+### **Module:addEvent** ( `eventName`: string )
 Adds an Event listener. It will create the Event object required, with the event name that has been provided.
 
 
@@ -101,7 +101,7 @@ Adds an Event listener. It will create the Event object required, with the event
 
 ---
 
-### **Module:trigger** ( String:`eventName` )
+### **Module:trigger** ( `eventName`: string )
 Triggers the callbacks of an event emmited. This function should not be called other than inside a true event definition. For the sake of performance, it assumes that the event provided already exists, and thus doesn't check for a nil listener.
 
 
@@ -114,7 +114,7 @@ Triggers the callbacks of an event emmited. This function should not be called o
 
 ---
 
-### **Module:increaseRuntime** ( Int:`increment` )
+### **Module:increaseRuntime** ( `increment`: int )
 Increases the runtime counter of the Module. It will also check if the runtime reaches the limit established for the module, and trigger a `Module Pause` in such case.
 
 
@@ -154,7 +154,7 @@ Sets the appropiate Cycle of runtime checking. Whenever a new cycle occurs, the 
 
 ---
 
-### **Module:setSync** ( String:`playerName` )
+### **Module:setSync** ( `playerName`: string )
 Seeks for the player with the lowest latency to make them the sync, or establishes the selected one. Seeks for the player with the lowest latency for syncing.
 
 

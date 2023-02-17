@@ -106,7 +106,7 @@ local formatDoc = function(dt)
 	local plist2 = {}
 	local rlist = {}
 	for pos, param in ipairs(dt.params) do
-		plist1[pos] = ("%s:`%s`"):format(param.type, param.name)
+		plist1[pos] = ("`%s`: %s"):format(param.name, (param.type or ""):lower())
 		plist2[pos] = ("- **%s** (`%s`) : %s"):format(param.name, param.type, param.description)
 	end
 	
