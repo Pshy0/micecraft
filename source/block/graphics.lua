@@ -1,4 +1,10 @@
 do
+	--- Returns a diplay object from the Block, given the index, if it exists.
+	-- @name Block:getDisplay
+	-- @param Any:index The identifier of the Display object
+	-- @return `Object` The Display object
+	-- @return `Number` The numerical index
+	-- @return `String` The string index 
 	local type = type
 	function Block:getDisplay(index)
 		local numeric, str
@@ -15,8 +21,11 @@ do
 end
 
 do
+	--- Shows the Block in the World.
+	-- All Displays are shown in the order established.
+	-- @name Block:display
+	-- @return `Boolean` Whether it displayed or not
 	local addImage = tfm.exec.addImage
-	
 	function Block:display()
 		if self.displayList then
 			local rlist = self.removalList
@@ -47,6 +56,23 @@ do
 end
 
 do	
+	--- Adds a new Display object to the Block.
+	-- There's no check if a previous display already exists, beware of
+	-- overwritting other of your displays when specifing its order.
+	-- @name Block:addDisplay
+	-- @param String:name The name of the Display object
+	-- @param Int:order The position in the stack for it to be rendered. The stack iteration is ascending
+	-- @param String:imageUrl The URL of the image in the domain `images.atelier801.com`.
+	-- @param String:targetLayer The layer to show the sprite in
+	-- @param Int:displayX The horizontal coordinate in the map
+	-- @param Int:displayY The vertical coordinate in the map
+	-- @param Number:scaleX The horizontal scale of the sprite
+	-- @param Number:scaleY The vertical scale of the sprite
+	-- @param Number:rotation The rotation, in radians, of the sprite
+	-- @param Number:alpha The opacity of the sprite
+	-- @param Boolean:show Whether the new display object should be instantly rendered
+	-- @return `Int` The order of the object in the Display stack
+	-- @return `String` The name of the object
 	local addImage = tfm.exec.addImage
 	local tinsert = table.insert
 	function Block:addDisplay(name, order, imageUrl, targetLayer, displayX, displayY, scaleX, scaleY, rotation, alpha, show)
@@ -85,6 +111,10 @@ do
 end
 
 do
+	--- Removes a Display object from the Block
+	-- @name Block:removeDisplay
+	-- @param Any:index The index of the Display object
+	-- @param Boolean:hide Whether the sprite attached to this display should be automatically removed
 	local type
 	local removeImage = tfm.exec.removeImage
 	function Block:removeDisplay(index, hide)
@@ -99,6 +129,9 @@ do
 		self.associativeList[str] = nil
 	end
 	
+	
+	--- Removes **all** displays from a Block.
+	-- @name Block:removeAllDisplays
 	function Block:removeAllDisplays()
 		self.displayList = {}
 		self:initDisplay()
@@ -108,6 +141,9 @@ end
 do
 	local removeImage = tfm.exec.removeImage
 	
+	--- Hides a Block and all its sprites from the map.
+	-- @name Block:hide
+	-- @return `Boolean` If the hiding was successful
 	function Block:hide()
 		local rlist = self.removalList
 		
@@ -124,6 +160,10 @@ do
 end
 
 do
+	--- Refreshes the Display of a Block
+	-- All sprites are hidden and shown again.
+	-- @name Block:refreshDisplay
+	-- @return `Boolean` Whether it refreshed successfully or not
 	function Block:refreshDisplay()
 		return self:hide() and self:display()
 	end
@@ -131,6 +171,12 @@ do
 	local addImage = tfm.exec.addImage
 	local removeImage = tfm.exec.removeImage
 	
+	
+	--- Refreshes a single Display object.
+	-- Same behaviour as [Block:refreshDisplay](Blocks.md#Block:refreshDisplay).
+	-- @name Block:refreshDisplayAt
+	-- @param Any:index The index to refresh the Display
+	-- @return ``
 	function Block:refreshDisplayAt(index)
 		if index then
 			local sprite = self:getDisplay(index)
@@ -156,6 +202,11 @@ do
 	end
 end
 
+--- Sets the Block default display objects.
+-- These displays are:
+-- 1. The main object sprite according to its type.
+-- 2. The shadow sprite, in case it's in background layer.
+-- @name Block:setDefaultDisplay
 function Block:setDefaultDisplay()
 	if self.type ~= 0 then
 		self:addDisplay("main", 1, self.sprite, nil, self.dx, self.dy, REFERENCE_SCALE_X, REFERENCE_SCALE_Y, 0, 1.0)

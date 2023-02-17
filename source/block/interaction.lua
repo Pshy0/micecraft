@@ -1,3 +1,13 @@
+--- Creates a new Block.
+-- The state of the Block is changed from what it was previously to
+-- the new specified state. If the specified Block type doesn't exist,
+-- it will default to an invalid block type.
+-- @name Block:create
+-- @param Int:type The type of the Block
+-- @param Boolean:foreground Whether the new state belongs to the foreground layer or not
+-- @param Boolean:display Whether the new state should be automatically displayed
+-- @param Boolean:update Whether the nearby Blocks should receive the `Block:onUpdate` event
+-- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically
 function Block:create(type, foreground, display, update, updatePhysics)
 	if type == 0 then
 		self:setVoid()
@@ -54,6 +64,13 @@ function Block:create(type, foreground, display, update, updatePhysics)
 	end
 end
 
+--- Destroys a Block.
+-- In case the Block was in foreground layer, it will descend to background layer,
+-- otherwise, it becomes void.
+-- @name Block:destroy
+-- @param Boolean:display Whether the new state should be automatically displayed
+-- @param Boolean:update Whether the nearby Blocks should receive the `Block:onUpdate` event
+-- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically
 function Block:destroy(display, update, updatePhysics)
 	if self.type ~= 0 then
 		self.timestamp = currentTime()
@@ -98,6 +115,14 @@ do
 		"17dd4b98b5d.png" -- 10
 	}
 	
+	--- Sets the damage level of a Block
+	-- @name Block:setDamageLevel
+	-- @param Int:amount The amount of damage to set to the Block. Negative numbers are admited
+	-- @param Boolean:add Whether the specified amount should be added or adjusted directly
+	-- @param Boolean:display Whether the new state should be automatically displayed
+	-- @param Boolean:update Whether the nearby Blocks should receive the `Block:onUpdate` event (in case it's destroyed)
+	-- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically (in case it's destroyed)
+	-- @return `Boolean` Whether the Block has the specified amount of damage
 	function Block:setDamageLevel(amount, add, display, update, updatePhysics)
 		if self.type ~= 0 then
 			local fx = (add and self.damage + amount or amount)
@@ -137,6 +162,16 @@ do
 	end
 end
 
+
+--- Damages a Block.
+-- This is just an interface to `Block:setDamageLevel`.
+-- @name Block:damage
+-- @param Int:amount The amount of damage to apply to the Block
+-- @param Boolean:add Whether the specified amount should be added or adjusted directly
+-- @param Boolean:display Whether the new state should be automatically displayed
+-- @param Boolean:update Whether the nearby Blocks should receive the `Block:onUpdate` event (in case it's destroyed)
+-- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically (in case it's destroyed)
+-- @return `Boolean` Whether the Block has the specified amount of damage
 function Block:damage(amount, add, display, update, updatePhysics, player)
 	if self.type ~= 0 then
 		self:onHit(player)
@@ -153,6 +188,15 @@ function Block:damage(amount, add, display, update, updatePhysics, player)
 	return false
 end
 
+--- Repairs a Block previously damaged.
+-- This is just an interface to `Block:setDamageLevel`.
+-- @name Block:repair
+-- @param Int:amount The amount of damage to remove from the Block
+-- @param Boolean:add Whether the specified amount should be removed or adjusted directly
+-- @param Boolean:display Whether the new state should be automatically displayed
+-- @param Boolean:update Whether the nearby Blocks should receive the `Block:onUpdate` event (in case its state changes)
+-- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically (in case its state changes)
+-- @return `Boolean` Whether the Block has the specified amount of damage
 function Block:repair(amount, add, display, update, updatePhysics)
 	if self.type ~= 0 then
 		return self:setDamageLevel(-amount, add, display, update, updatePhysics)
@@ -162,6 +206,11 @@ function Block:repair(amount, add, display, update, updatePhysics)
 end
 
 do
+	--- Interacts with a Block.
+	-- Triggers the method `Block:onInteract` for the provided player.
+	-- @name Block:interact
+	-- @param Player:player The Player that interacts with this block
+	-- @return `Boolean` Whether the interaction was successful or not
 	local dist = math.udist
 	function Block:interact(player)
 		if self.interactable then
@@ -174,8 +223,10 @@ do
 			local yr = (self.interactable * height)
 			
 			if xd <= xr and yd <= yr then
-				self:onInteract(player)
+				return self:onInteract(player)
 			end
 		end
+		
+		return nil
 	end
 end

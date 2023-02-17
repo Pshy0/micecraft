@@ -149,12 +149,12 @@ Stretches a height map, or array with numerical values.
 
 ---
 
-### **table.copy** ( `nil`:  )
+### **table.copy** ( `t`: table )
 Copies a table and all its values recursively. It avoids keeping references over values.
 
 
 **Parameters:**
-- **nil** (`nil`) : nil
+- **t** (`Table`) : The table to copy
 
 
 **Returns:**

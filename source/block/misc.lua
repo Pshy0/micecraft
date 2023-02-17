@@ -1,31 +1,46 @@
+--- Retrieves the Chunk object from which the Block belongs to
+-- @name Block:getChunk
+-- @return `Chunk` The chunk object
 function Block:getChunk()
 	return World:getChunk(self.chunkX, self.chunkY, "matrix")
 end
 
-function Block:getBlocksAround(gtype, include)
-	local blocks = {}
-	if gtype == "cross" then
-		for y = -1, 1 do
-			if (y ~= 0) or include then
-				blocks[#blocks + 1] = World:getBlock(self.x, self.y + y, "matrix")
-			end
-		end
-		
-		blocks[#blocks + 1] = World:getBlock(self.x - 1, self.y, "matrix")
-		blocks[#blocks + 1] = World:getBlock(self.x + 1, self.y, "matrix")
-	elseif gtype == "square" then
-		for y = -1, 1 do
-			for x = -1, 1 do
-				if not (x == 0 and y == 0) or include then
-					blocks[#blocks + 1] = World:getBlock(self.x + x, self.y + y, "matrix")
+do
+--- Retrieves a list with the blocks adjacent to the Block.
+-- @name Block:getBlocksAround
+-- @param String:shape The shape to retrieve the blocks {cross: only adjacents, square: adjacents + edges}
+-- @param Boolean:include Whether the Block itself should be included in the list.
+-- @return `Table` An array with the adjacent blocks (in no particular order)
+	local ti = function(t, v)
+		t[#t + 1] = v
+	end
+	function Block:getBlocksAround(shape, include)
+		local blocks = {}
+		if shape == "cross" then
+			ti(blocks, World:getBlock(self.x - 1, self.y, "matrix"))
+			ti(blocks, World:getBlock(self.x, self.y - 1, "matrix"))
+			ti(blocks, World:getBlock(self.x + 1, self.y, "matrix"))
+			ti(blocks, World:getBlock(self.x, self.y + 1, "matrix"))
+			ti(blocks, self)
+		elseif shape == "square" then
+			for y = -1, 1 do
+				for x = -1, 1 do
+					if not (x == 0 and y == 0) or include then
+						ti(blocks, World:getBlock(self.x + x, self.y + y, "matrix"))
+					end
 				end
 			end
 		end
+		
+		return blocks
 	end
-	
-	return blocks
 end
 
+
+--- Interface for handling when a block state gets updated.
+-- @name Block:updateEvent
+-- @param Boolean:update Whether the blocks around should be updated (method: `Block:onUpdate`)
+-- @param Boolean:updatePhysics Whether the physics of the World should be updated
 function Block:updateEvent(update, updatePhysics)
 	do
 		local blocks = self:getBlocksAround("cross", false)
@@ -43,6 +58,10 @@ function Block:updateEvent(update, updatePhysics)
 end
 
 do
+	
+	--- Spreads particles from the Block.
+	-- @name Block:spreadParticles
+	-- @return `Boolean` Whether the particles were successfully spreaded or not
 	local displayParticle = tfm.exec.displayParticle
 	local random = math.random
 	function Block:spreadParticles()
@@ -71,11 +90,23 @@ do
 					-xv/10, -yv/10
 				)
 			end
+			
+			return true
 		end
+		
+		return false
 	end
+	
+	-- To do: Particles should spread differently according to a specified 'mode'
 end
 
 do
+	--- Plays the specified sound for the Block.
+	-- A block can have different types of sounds according to the event that happens to them.
+	-- @name Block:playSound
+	-- @param String:soundKey The key that identifies the event. If it doesn't exist, it will default to a regular sound.
+	-- @param Player:player The player that should hear this sound, if nil, applies to everyone.
+	-- @return `Boolean` Whether the sound was successfully played or not
 	local playSound = tfm.exec.playSound
 	function Block:playSound(soundKey, player)
 		-- pc - bc
@@ -83,10 +114,14 @@ do
 			local sound = self.sound[soundKey] or self.sound.default
 			playSound(
 				sound, 100,
-				(player.x - self.dxc) * REFERECE_SCALE_X,
-				(player.y - self.dyc) * REFERECE_SCALE_Y,
-				player.name
+				player and (player.x - self.dxc) * REFERECE_SCALE_X or self.dxc,
+				player and (player.y - self.dyc) * REFERECE_SCALE_Y or self.dyc,
+				player and player.name or nil
 			)
+			
+			return true
 		end
+		
+		return false
 	end
 end

@@ -1,3 +1,15 @@
+--- Creates a new Block object.
+-- @name Block:new
+-- @param Int:uniqueId The unique ID of the Block in the World
+-- @param Int:type The Block type. Data will be consulted on **blockMetadata** to apply for this object
+-- @param Boolean:foreground Whether the Block should be in the foreground layer or not
+-- @param Int:worldX Horizontal position of the Block in the World matrix
+-- @param Int:worldY Vertical position of the Block in the World matrix
+-- @param Int:displayX Horizontal position of the Block in Transformice's map
+-- @param Int:displayY Vertical position of the Block in Transformice's map
+-- @param Int:width Width of the block in pixels
+-- @param Int:height Height of the block in pixels
+-- @return `Block` The Block object
 function Block:new(uniqueId, type, foreground, worldX, worldY, displayX, displayY, width, height)
 	
 	local meta = blockMetadata:get(type)
@@ -79,6 +91,8 @@ end
 do
 	local void = function() end
 	
+	--- Sets the Block to a **void** state.
+	-- @name Block:setVoid
 	function Block:setVoid()
 		local meta = blockMetadata:get(0)
 		
@@ -113,14 +127,22 @@ do
 	end
 end
 
-function Block:setRelativeCoordinates(x, y, id, CX, CY, CID)
-	self.cx = x or 0
-	self.cy = y or 0
-	self.chunkUniqueId = id
+--- Sets the Block relative coordinates to its chunk.
+-- @name Block:setRelativeCoordinates
+-- @param Int:xInChunk The horizontal position of the Block in its Chunk
+-- @param Int:yInChunk The vertical position of the Block in its Chunk
+-- @param Int:idInChunk The unique identifier of the Block in its Chunk 
+-- @param Int:chunkX The horizontal position of the Chunk in the World
+-- @param Int:chunkY The vertical position of the Chunk in the World
+-- @param Int:chunkId The unique identifier of the Chunk in the World
+function Block:setRelativeCoordinates(xInChunk, yInChunk, idInChunk, chunkX, chunkY, chunkId)
+	self.cx = xInChunk or 0
+	self.cy = yInChunk or 0
+	self.chunkUniqueId = idInChunk
 	
-	self.chunkX = CX
-	self.chunkY = CY
-	self.chunkId = CID
+	self.chunkX = chunkX
+	self.chunkY = chunkY
+	self.chunkId = chunkId
 	
 	self.dxc = self.dx + (self.width / 2)
 	self.dyc = self.dy + (self.height / 2)

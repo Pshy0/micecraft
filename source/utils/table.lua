@@ -18,7 +18,7 @@ do
 	--- Copies a table and all its values recursively.
 	-- It avoids keeping references over values.
 	-- @name table.copy
-	-- @param t The table to copy
+	-- @param Table:t The table to copy
 	-- @return `Table` The table copied.
 	table.copy = function(t)
 		if type(t) == "table" then
