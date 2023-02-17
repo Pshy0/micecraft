@@ -132,7 +132,7 @@ local formatDoc = function(dt)
 	return table.concat(dlines, "\n")
 end
 
-local generateDocs = function(content)
+local generateDocs = function(content, moduloName)
 	local docs = {}
 	
 	for doc in content:gmatch("(%-%-%-.-%-%-.-)\n%s+[^%-]+") do
@@ -195,7 +195,7 @@ local buildModule = function(modulo, log)
         fileContent, result = os.readFile(path)
         if log then
             if fileContent then
-				if modulo.__docs then docs[#docs + 1] = generateDocs(fileContent) end
+				if modulo.__docs then docs[#docs + 1] = generateDocs(fileContent, modulo.__name) end
                 print(("[success] %s (%d)"):format(path, #fileContent))
 
                 if releaseBuild then
@@ -228,7 +228,7 @@ local buildModule = function(modulo, log)
 		local docsComp = table.concat(docs, "\n\n---\n\n") or ""
 		local dpath = ("%s/%s.md"):format(modulo.__directory, modulo.__name)
 		local Doc = io.open(dpath, "w")
-		Doc:write(docsComp)
+		Doc:write(("#%s\n\n---\n\n"):format(modulo.__name, docsComp))
 		Doc:close()
 	end
 	
