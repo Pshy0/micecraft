@@ -178,7 +178,7 @@ local generateDocs = function(content)
 	end
 
 	if #docs > 0 then
-		return table.concat(docs, "\n\n\n\n\n")
+		return table.concat(docs, "\n\n---\n\n")
 	else
 		return nil
 	end
@@ -225,7 +225,7 @@ local buildModule = function(modulo, log)
     end
 	
 	if modulo.__docs then
-		local docsComp = table.concat(docs, "\n\n\n\n\n") or ""
+		local docsComp = table.concat(docs, "\n\n---\n\n") or ""
 		local dpath = ("%s/%s.md"):format(modulo.__directory, modulo.__name)
 		local Doc = io.open(dpath, "w")
 		Doc:write(docsComp)

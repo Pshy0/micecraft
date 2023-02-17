@@ -9,8 +9,7 @@ Rounds a number to the nearest integer. For numbers with decimal digit under 0.5
 **Returns:**
 - `Number` The number rounded.
 
-
-
+---
 
 ### **math.restrict** ( Number:`number`, Number:`lower`, Number:`higher` )
 Restrict the given input between two limits. 
@@ -25,8 +24,7 @@ Restrict the given input between two limits.
 **Returns:**
 - `Number` The number between the specified range.
 
-
-
+---
 
 ### **math.pythag** ( Number:`ax`, Number:`ay`, Number:`bx`, Number:`by` )
 Returns the distance between two points on a cartesian plane. 
@@ -42,8 +40,7 @@ Returns the distance between two points on a cartesian plane.
 **Returns:**
 - `Number` The distance between both points.
 
-
-
+---
 
 ### **math.udist** ( Number:`a`, Number:`b` )
 Returns the absolute difference between two numbers. 
@@ -57,8 +54,7 @@ Returns the absolute difference between two numbers.
 **Returns:**
 - `Number` The absolute difference.
 
-
-
+---
 
 ### **math.precision** ( Number:`number`, Int:`precision` )
 Rounds a number to the specified level of precision. The precision is the amount of decimal points after the integer part.
@@ -72,8 +68,7 @@ Rounds a number to the specified level of precision. The precision is the amount
 **Returns:**
 - `Number` The number with the corrected precision.
 
-
-
+---
 
 ### **math.tobase** ( Number:`number`, Int:`base` )
 Converts a number to a string representation in another base. The base can be as lower as 2 or as higher as 64, otherwise it returns nil.
@@ -87,8 +82,7 @@ Converts a number to a string representation in another base. The base can be as
 **Returns:**
 - `String` The number converted to the specified base.
 
-
-
+---
 
 ### **math.tonumber** ( String:`str`, Int:`base` )
 Converts a string to a number, if possible. The base can be as lower as 2 or as higher as 64, otherwise it returns nil. When bases are equal or lower than 36, it uses the native Lua `tonumber` method.
@@ -102,8 +96,7 @@ Converts a string to a number, if possible. The base can be as lower as 2 or as 
 **Returns:**
 - `String` The string converted to number from the specified base.
 
-
-
+---
 
 ### **math.cosint** ( Number:`a`, Number:`b`, Number:`s` )
 Interpolates two points with a cosine curve. 
@@ -118,8 +111,7 @@ Interpolates two points with a cosine curve.
 **Returns:**
 - `Number` Resultant point with value interpolated through cosine function.
 
-
-
+---
 
 ### **math.heightMap** ( Number:`amplitude`, Number:`waveLenght`, Int:`width`, Number:`offset`, Number:`lower`, Number:`higher` )
 Generates a Height Map based on the current `randomseed`. 
@@ -137,8 +129,7 @@ Generates a Height Map based on the current `randomseed`.
 **Returns:**
 - `Table` An array that contains each point of the height map.
 
-
-
+---
 
 ### **math.stretchMap** ( Table:`ls`, Int:`mul` )
 Stretches a height map, or array with numerical values. 
@@ -152,8 +143,7 @@ Stretches a height map, or array with numerical values.
 **Returns:**
 - `Table` The array stretched
 
-
-
+---
 
 ### **nil** ( nil:`nil` )
 Copies a table and all its values recursively. It avoids keeping references over values.
@@ -166,8 +156,7 @@ Copies a table and all its values recursively. It avoids keeping references over
 **Returns:**
 - `Table` The table copied.
 
-
-
+---
 
 ### **nil** ( nil:`nil` )
 Inhertis all values to a table, from the specified one. It does not modify the original tables, but copies them, to avoid inconsistencies. All values to inherit will overwrite values on the target table.
@@ -180,8 +169,7 @@ Inhertis all values to a table, from the specified one. It does not modify the o
 **Returns:**
 - `Table` The new child table, product of the tables provided.
 
-
-
+---
 
 ### **nil** ( nil:`nil`, nil:`nil` )
 Searches for a value across a table. Will return the first index of where it was found, otherwise returns nil.
@@ -196,14 +184,12 @@ Searches for a value across a table. Will return the first index of where it was
 - `Any` The key or index where the element was found.
 - `Any` The element specified.
 
-
-
+---
 
 ### **nil** (  )
 Searches for a value, but in a depth of 1 index. Refer to table.find for more information.
 
-
-
+---
 
 ### **nil** ( nil:`nil`, nil:`nil` )
 Gives the specific data of a module from an encoded string. 
@@ -217,8 +203,7 @@ Gives the specific data of a module from an encoded string.
 **Returns:**
 - `String` The raw data for this module, otherwise an empty string.
 
-
-
+---
 
 ### **nil** ( nil:`nil`, nil:`nil`, nil:`nil` )
 Sets the data to the specified module on an encoded string 
@@ -236,8 +221,7 @@ Sets the data to the specified module on an encoded string
 - `String` The old encoded data
 - `String` The old raw data for the module
 
-
-
+---
 
 ### **nil** ( nil:`nil`, nil:`nil` )
 Decodes a piece of raw data. 
@@ -251,8 +235,7 @@ Decodes a piece of raw data.
 **Returns:**
 - `Table` The table with the data.
 
-
-
+---
 
 ### **nil** ( nil:`nil`, nil:`nil` )
 Parses a value encoded or compressed. 
@@ -266,8 +249,7 @@ Parses a value encoded or compressed.
 **Returns:**
 - `Any` The value decoded.
 
-
-
+---
 
 ### **nil** ( nil:`nil`, nil:`nil` )
 Encondes a value into a reasonable format. 
@@ -281,8 +263,7 @@ Encondes a value into a reasonable format.
 **Returns:**
 - `String` The value encoded.
 
-
-
+---
 
 ### **nil** ( nil:`nil`, nil:`nil` )
 Encodes a table into a reasonable format. 

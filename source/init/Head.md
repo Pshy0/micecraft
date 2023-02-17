@@ -7,8 +7,7 @@ Crashes on the slightlest sign of a global. We don't want globals in our code. T
 - **k** (`Any`) : Key
 - **v** (`Any`) : Value
 
-
-
+---
 
 ### **Module:init** ( Unknown:`apiVersion`, Unknown:`tfmVersion` )
 Initializes the Module. This function creates the table for the event list, the registers of runtime and may be used to verify various other things. It should only be called on pre-start, because it doesn't check if previous values already exist, and may delete all of them.
@@ -18,8 +17,7 @@ Initializes the Module. This function creates the table for the event list, the 
 - **apiVersion** (`Unknown`) : The **Module API** version were this Module was last updated to
 - **tfmVersion** (`Unknown`) : The **Transformice** version were this Module was last updated to
 
-
-
+---
 
 ### **Module:assertVersion** ( Unknown:`apiVersion`, Unknown:`tfmVersion` )
 Asserts if API version matches the defined version for this Module. In case it doesn't, a warning will be displayed for players to inform the developer. 
@@ -33,8 +31,7 @@ Asserts if API version matches the defined version for this Module. In case it d
 **Returns:**
 - `Boolean` Whether the versions defined match
 
-
-
+---
 
 ### **Module:emitWarning** ( Int:`severity`, String:`message` )
 Emits a warning, as a message on chat, with the issue provided. 
@@ -44,8 +41,7 @@ Emits a warning, as a message on chat, with the issue provided.
 - **severity** (`Int`) : How severe is the warning. Accepts values from 1 to 4, being 1 the most severe and 4 the least severe.
 - **message** (`String`) : The warning message to display.
 
-
-
+---
 
 ### **Module:unload** ( Boolean:`handled` )
 Triggers an exit of the proccess. It should only be called on special situations, as a server restart or a module crash. It will automatically save all the data that needs to be saved, in case the unload is 'handled'.
@@ -54,8 +50,7 @@ Triggers an exit of the proccess. It should only be called on special situations
 **Parameters:**
 - **handled** (`Boolean`) : Wheter the unloading is caused by a handled situation or not.
 
-
-
+---
 
 ### **Module:onError** ( String:`errorMessage`, Any:`...` )
 Callback when the Module crashes for any error. Save data
@@ -65,8 +60,7 @@ Callback when the Module crashes for any error. Save data
 - **errorMessage** (`String`) : The reason of the error.
 - **...** (`Any`) : Extra arguments
 
-
-
+---
 
 ### **Module:throwException** ( Boolean:`fatal`, String:`errorMessage`, Any:`...` )
 Throws an exception report. The exception can either be fatal or not, and the handling of the Module against that exception will change accordingly. To do
@@ -77,8 +71,7 @@ Throws an exception report. The exception can either be fatal or not, and the ha
 - **errorMessage** (`String`) : The reason for this Exception
 - **...** (`Any`) : Extra arguments
 
-
-
+---
 
 ### **Module:on** ( String:`eventName`, Function:`callback` )
 Creates a callback to trigger when an Event is emmited. In case the Event exists, it will append the callback to the internal list of the Event, so every callback will be executed on the order it is defined. Otherwise it doesn't exist, an Event object will be created, and the Event will be defined on the Global Space.
@@ -93,8 +86,7 @@ Creates a callback to trigger when an Event is emmited. In case the Event exists
 - `Boolean` Whether a new Event object was created or not.
 - `Number` The position of the callback in the calls list.
 
-
-
+---
 
 ### **Module:addEvent** ( String:`eventName` )
 Adds an Event listener. It will create the Event object required, with the event name that has been provided.
@@ -107,8 +99,7 @@ Adds an Event listener. It will create the Event object required, with the event
 **Returns:**
 - `Boolean` Whether or not a new Event object has been created.
 
-
-
+---
 
 ### **Module:trigger** ( String:`eventName` )
 Triggers the callbacks of an event emmited. This function should not be called other than inside a true event definition. For the sake of performance, it assumes that the event provided already exists, and thus doesn't check for a nil listener.
@@ -121,8 +112,7 @@ Triggers the callbacks of an event emmited. This function should not be called o
 **Returns:**
 - `Boolean` Whether the Event triggered without errors.
 
-
-
+---
 
 ### **Module:increaseRuntime** ( Int:`increment` )
 Increases the runtime counter of the Module. It will also check if the runtime reaches the limit established for the module, and trigger a `Module Pause` in such case.
@@ -135,8 +125,7 @@ Increases the runtime counter of the Module. It will also check if the runtime r
 **Returns:**
 - `Boolean` Whether the increment in runtime has caused the Module to pause.
 
-
-
+---
 
 ### **Module:pause** (  )
 Triggers a Module Pause. When it triggers, no events will be listened, and all objects will freeze. This function is automatically called by a runtime check when an event triggers, however, it `should` be safe to call it dinamically. After pausing, the Module will automatically ressume on the next cycle.
@@ -145,8 +134,7 @@ Triggers a Module Pause. When it triggers, no events will be listened, and all o
 **Returns:**
 - `Number` The time it will take to ressume the Module, in milliseconds.
 
-
-
+---
 
 ### **Module:continue** (  )
 Continues the Module execution. All events ressume listening, as well as players take back their movility. It will check if the Module is already paused, so it is safe to call it without previous checks.
@@ -155,8 +143,7 @@ Continues the Module execution. All events ressume listening, as well as players
 **Returns:**
 - `Boolean` Whether the Module has been resumed or not.
 
-
-
+---
 
 ### **Module:setCycle** (  )
 Sets the appropiate Cycle of runtime checking. Whenever a new cycle occurs, the runtime counter will reset, and its fingerprint will log.
@@ -165,8 +152,7 @@ Sets the appropiate Cycle of runtime checking. Whenever a new cycle occurs, the 
 **Returns:**
 - `Number` The current cycle.
 
-
-
+---
 
 ### **Module:setSync** ( String:`playerName` )
 Seeks for the player with the lowest latency to make them the sync, or establishes the selected one. Seeks for the player with the lowest latency for syncing.
