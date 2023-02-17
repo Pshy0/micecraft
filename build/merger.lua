@@ -228,7 +228,7 @@ local buildModule = function(modulo, log)
 		local docsComp = table.concat(docs, "\n\n---\n\n") or ""
 		local dpath = ("%s/%s.md"):format(modulo.__directory, modulo.__name)
 		local Doc = io.open(dpath, "w")
-		Doc:write(("#%s\n\n---\n\n%s"):format(modulo.__name, docsComp))
+		Doc:write(("# %s\n\n---\n\n%s"):format(modulo.__name, docsComp))
 		Doc:close()
 	end
 	
