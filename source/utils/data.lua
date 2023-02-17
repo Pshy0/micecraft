@@ -9,8 +9,9 @@ do -- Localize variables to reduce workload
 	local xCHAR = char(17)
 	
 	--- Gives the specific data of a module from an encoded string.
-	-- @param str The data to search into
-	-- @param m_id The module identificator
+	-- @name data.getFromModule
+	-- @param String:str The data to search into
+	-- @param String:m_id The module identificator, being at least three uppercase characters.
 	-- @return `String` The raw data for this module, otherwise an empty string.
 	data.getFromModule = function(str, m_id)
 		
@@ -25,9 +26,10 @@ do -- Localize variables to reduce workload
 	end
 	
 	--- Sets the data to the specified module on an encoded string
-	-- @param str The complete raw data
-	-- @param m_id The module identifier
-	-- @param rawdata The raw data to apply to the specified module
+	-- @name data.setToModule
+	-- @param String:str The complete raw data
+	-- @param String:m_id The module identifier
+	-- @param String:rawdata The raw data to apply to the specified module
 	-- @return `String` The new encoded data
 	-- @return `String` The new raw data for the module
 	-- @return `String` The old encoded data
@@ -51,8 +53,9 @@ do -- Localize variables to reduce workload
 	end
 	
 	--- Decodes a piece of raw data.
-	-- @param str The raw data
-	-- @param depth The depth to look at, in case it's a table.
+	-- @name data.decode
+	-- @param String:str The raw data
+	-- @param Int:depth The depth to look at, in case it's a table.
 	-- @return `Table` The table with the data.
 	data.decode = function(str, depth)
 		depth = depth or 1
@@ -76,8 +79,9 @@ do -- Localize variables to reduce workload
 	end
 
 	--- Parses a value encoded or compressed.
-	-- @param str The encoded data.
-	-- @param depth The deep to look at, in case it's a Table
+	-- @name data.parse
+	-- @param String:str The encoded data.
+	-- @param Int:depth The deep to look at, in case it's a Table
 	-- @return `Any` The value decoded.
 	data.parse = function(str, depth)
 		local booleans = {
@@ -102,8 +106,9 @@ do -- Localize variables to reduce workload
 	end
 
 	--- Encondes a value into a reasonable format.
-	-- @param this The value to convert
-	-- @param depth The depth to encode at, in case it's a table
+	-- @name data.serialize
+	-- @param Any:this The value to convert
+	-- @param Int:depth The depth to encode at, in case it's a table
 	-- @return `String` The value encoded.
 	data.serialize = function(this, depth)
 		local value = ""
@@ -128,8 +133,9 @@ do -- Localize variables to reduce workload
 	end
 	
 	--- Encodes a table into a reasonable format.
-	-- @param this The table to encode
-	-- @param depth The depth to encode at (by default it's 1)
+	-- @name data.encode
+	-- @param Table:this The table to encode
+	-- @param Int:depth The depth to encode at (by default it's 1)
 	-- @return `String` The encoded table
 	data.encode = function(this, depth)
 		depth = depth or 1

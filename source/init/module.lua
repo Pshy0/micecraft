@@ -110,7 +110,7 @@ end
 -- @param Boolean:fatal Wheter the Exception happened on a sensitive part of the Module or not
 -- @param String:errorMessage The reason for this Exception
 -- @param Any:... Extra arguments
-function Module:throwException(fatal, errorMessage, ...) -- To do
+function Module:throwException(fatal, errorMessage, ...)
 	if fatal then
 		self:onError(errorMessage, ...)
 	else

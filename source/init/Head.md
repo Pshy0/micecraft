@@ -63,7 +63,7 @@ Callback when the Module crashes for any error. Save data
 ---
 
 ### **Module:throwException** ( `fatal`: boolean, `errorMessage`: string, `...`: any )
-Throws an exception report. The exception can either be fatal or not, and the handling of the Module against that exception will change accordingly. To do
+Throws an exception report. The exception can either be fatal or not, and the handling of the Module against that exception will change accordingly.
 
 
 **Parameters:**
