@@ -218,10 +218,6 @@ Refreshes a single Display object. Same behaviour as [Block:refreshDisplay](Bloc
 **Parameters:**
 - **index** (`Any`) : The index to refresh the Display
 
-
-**Returns:**
-- `nil` nil
-
 ---
 
 ### **Block:setDefaultDisplay** (  )

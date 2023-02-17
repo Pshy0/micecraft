@@ -11,6 +11,8 @@ function Module:init(apiVersion, tfmVersion)
 	self.tfmVersion = ""
 	self:assertVersion(apiVersion, tfmVersion)
 	
+	self.modeList = {}
+	
 	self.eventList = {}
 	self.currentCycle = 0
 	self.cycleDuration = 4100
@@ -79,18 +81,17 @@ do
 	-- needs to be saved, in case the unload is 'handled'.
 	-- @name Module:unload
 	-- @param Boolean:handled Wheter the unloading is caused by a handled situation or not.
+	-- @param String:errorMessage The reason of the error.
+	-- @param Any:... Extra arguments
 	local newTimer = system.newTimer
 	local exit = system.exit
-	function Module:unload(handled)
+	function Module:unload(handled, errorMessage, ...)
+		print(handled)
 		if handled then
-			-- Save Data of everyone
+			self:emitWarning(1, errorMessage, ...)
 		else
-			self:emitWarning(1, "The Module has been unloaded due to an uncatched exception.")
+			self:emitWarning(1, "The Module has been unloaded due to an uncatched exception.\nIssue: " .. (errorMessage or "Unknown"))
 		end
-		
-		newTimer(function(id)
-			exit()
-		end, 500, false)
 	end
 end
 
@@ -100,7 +101,7 @@ end
 -- @param Any:... Extra arguments
 function Module:onError(errorMessage, ...)
 	-- Save data
-	self:unload(true)
+	self:unload(true, errorMessage, ...)
 end
 
 --- Throws an exception report.
@@ -442,7 +443,7 @@ function Module:newMode(modeName, constructor)
 end
 
 function Module:getMode(modeName)
-	modeName = modeName or self.subMode
+	modeName = modeName or self.subMode or ""
 	return self.modeList[modeName] or self.modeList[modeName:lower()]
 end
 
@@ -465,9 +466,12 @@ do
 					rawset(mode.environment, k, v)
 				end
 			})
+			mode.__index = mode
 		
 			self.settings = mode:getSettings()
 		end
+		
+		self.subMode = mode.name
 		
 		return mode
 	end

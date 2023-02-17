@@ -43,8 +43,11 @@ local fileList = {
 		__directory = "source/world",
 		__docs = true,
 		"init",
+		"env",
 		"interaction",
 		"generation",
+		"physics",
+		--"biome",
 		"encoding"
 	},
 	[6] = {
@@ -72,6 +75,20 @@ local fileList = {
 		"data"
 	},
 	[9] = {
+		__name = "MetaData",
+		__directory = "source/metadata",
+		__docs = true,
+		"logic",
+		"block"
+	},
+	[10] = {
+		__name = "Modes",
+		__directory = "source/modes",
+		__docs = false,
+		"init",
+		"default"
+	},
+	[11] = {
 		__name = "Events",
 		__directory = "source/events",
 		__docs = false,
@@ -80,7 +97,7 @@ local fileList = {
 		"PlayerDataLoaded",
 		"PlayerLeft"
 	},
-	[10] = {
+	[12] = {
 		__name = "Launch",
 		__directory = "source/launch",
 		__docs = false,

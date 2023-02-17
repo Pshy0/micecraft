@@ -47,12 +47,14 @@ Emits a warning, as a message on chat, with the issue provided.
 
 ---
 
-### **Module:unload** ( `handled`: boolean )
+### **Module:unload** ( `handled`: boolean, `errorMessage`: string, `...`: any )
 Triggers an exit of the proccess. It should only be called on special situations, as a server restart or a module crash. It will automatically save all the data that needs to be saved, in case the unload is 'handled'.
 
 
 **Parameters:**
 - **handled** (`Boolean`) : Wheter the unloading is caused by a handled situation or not.
+- **errorMessage** (`String`) : The reason of the error.
+- **...** (`Any`) : Extra arguments
 
 ---
 

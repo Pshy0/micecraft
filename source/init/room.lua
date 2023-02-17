@@ -63,7 +63,7 @@ end
 
 function Room:newPlayer(playerName)
 	if not self:hasPlayer(playerName) then
-		self.playerList[playerName] = Player.new(playerName)
+		self.playerList[playerName] = Player:new(playerName)
 		
 		self:getPlayer(playerName):loadData()
 		

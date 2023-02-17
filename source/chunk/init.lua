@@ -14,8 +14,8 @@ function Chunk:new(uniqueId, x, y, width, height, xFact, yFact, dx, dy, biome)
 		xf = xFact, -- X Start
 		yf = yFact, -- Y Start
 		
-		xb = xFact + width, -- X Boundary
-		yb = yFact + height, -- Y Boundary
+		xb = xFact + (width - 1), -- X Boundary
+		yb = yFact + (height - 1), -- Y Boundary
 		
 		collidesTo = {},
 		displaysTo = {},

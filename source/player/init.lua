@@ -1,5 +1,5 @@
 function Player:new(playerName)
-	local info = tfm.get.room.playerList[playerName]
+	local info = tfm.get.room.playerList[playerName] or {}
 	
 	local this = setmetatable({
 		name = playerName,
@@ -31,7 +31,7 @@ function Player:new(playerName)
 end
 
 function Player:init()
-	local this = tfm.get.room.playerList[self.name]
+	local this = tfm.get.room.playerList[self.name] or {}
 	
 	self.isMoving = false
 	self.isJumping = false

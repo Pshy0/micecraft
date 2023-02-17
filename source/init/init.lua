@@ -1,3 +1,4 @@
+local VERSION = "0.1.0-alpha"
 local LOCAL_EPOCH = os.time()
 
 local bit32, coroutine, math, os, string, table = _G.bit32, _G.coroutine, _G.math, _G.os, _G.string, _G.table
@@ -40,7 +41,11 @@ end
 local xmlLoad = '<C><P Ca="" H="%d" L="%d" /><Z><S></S><D><DS X="%d" Y="%d" /></D><O /></Z></C>'
 
 local Module = {}
-local Room = {}
+
+local Room = {
+	playerList = {},
+	presencePlayerList = {}
+}
 
 local Mode = {}
 
@@ -54,7 +59,15 @@ Block.__index = Block
 local Chunk = {}
 Chunk.__index = Chunk
 
-local World = {}
+local World = {
+	physicsMap = {},
+	blocks = {},
+	chunks = {}
+}
+
+local MetaData = {}
+MetaData.__index = MetaData
+local blockMetadata = {}
 
 local Player = {}
 Player.__index = Player

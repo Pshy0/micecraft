@@ -176,7 +176,6 @@ do
 	-- Same behaviour as [Block:refreshDisplay](Blocks.md#Block:refreshDisplay).
 	-- @name Block:refreshDisplayAt
 	-- @param Any:index The index to refresh the Display
-	-- @return ``
 	function Block:refreshDisplayAt(index)
 		if index then
 			local sprite = self:getDisplay(index)

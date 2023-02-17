@@ -51,7 +51,7 @@ do
 	-- @return `Object` The new object.
 	function MetaData:set(index, template, definition)
 		if not definition then
-			definition = template
+			definition = type(template) == "string" and self:getTemplate(template) or template
 			template = nil
 		end
 		
@@ -59,7 +59,7 @@ do
 		
 		if template then
 			if type(template) == "table" then
-				object = inherit(template, definition)
+				object = inherit(template, object)
 			else
 				template = self.__templates[template]
 				

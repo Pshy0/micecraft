@@ -173,10 +173,10 @@ do
 		end
 	end
 	
-	function Chunk:setPhysicState(active, segmentRange)
-		if segmentRange then
+	function Chunk:setPhysicState(active, segmentList)
+		if segmentList then
 			local segment
-			for _, segmentId in ipairs(segmentRange) do
+			for segmentId, _ in next, segmentList do
 				segment = self.segments[segmentId]
 				if segment then
 					segment:setState(active)

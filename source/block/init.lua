@@ -83,7 +83,7 @@ function Block:new(uniqueId, type, foreground, worldX, worldY, displayX, display
 
 	this.__index = self
 	
-	self:setDefaultDisplay()
+	this:setDefaultDisplay()
 	
 	return this, meta.category
 end

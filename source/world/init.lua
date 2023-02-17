@@ -6,7 +6,7 @@ function World:generateNewMapData()
 	for y = 1, height do
 		pre[y] = {}
 		for x = 1, width do
-			pre[y][x] = {0, false}
+			pre[y][x] = {type=0, tangible=false}
 		end
 	end
 	
@@ -75,7 +75,14 @@ function World:initChunks()
 		self.chunks[y] = {}
 		for x = 1, widthLim do
 			chunkId = chunkId + 1
-			self.chunks[y][x] = Chunk:new(chunkId, x, y, width, height, xoff + (x - 1) * width, yoff + (y - 1) * height)
+			self.chunks[y][x] = Chunk:new(
+				chunkId, 
+				x, y, 
+				width, height, 
+				((x-1) * width) + 1, ((y-1) * height) + 1,
+				xoff + ((x - 1) * xp), yoff + ((y-1) * yp),
+				1
+			)
 		end
 	end
 end
@@ -84,13 +91,12 @@ function World:init()
 	self.pre = {}
 	self.blocks = {}
 	self.chunks = {}
-	self.physicsMap = {}
 	
 	local mode = Module:getMode()
 	
 	self:generateNewMapData()
 	
-	mode:setWorld()
+	mode:setWorld(self)
 	
 	self:initPhysics()
 	self:initBlocks()

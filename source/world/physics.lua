@@ -99,7 +99,7 @@ do
 			end
 			
 			if matches > 0 then
-				q(list, self:getSegment(xs, ys, xe, ye, 1)
+				q(list, self:getSegment(xs, ys, xe, ye, 1))
 			end
 			
 		until (matches == 0)
@@ -261,7 +261,7 @@ do
 					self[y][x] = -self[y][x]
 				else
 					if match then
-						q(list, self:getSegment(xs, y, xe, y, 1)
+						q(list, self:getSegment(xs, y, xe, y, 1))
 						match = false
 					end
 				end
@@ -295,7 +295,7 @@ do
 					self[y][x] = -self[y][x]
 				else
 					if match then
-						q(list, self:getSegment(xs, y, xe, y, match)
+						q(list, self:getSegment(xs, y, xe, y, match))
 						match = false
 					end
 				end

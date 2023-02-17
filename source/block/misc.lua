@@ -44,15 +44,17 @@ end
 function Block:updateEvent(update, updatePhysics)
 	do
 		local blocks = self:getBlocksAround("cross", false)
-			
+		local segmentList = {}
 		if update ~= false then
-			for block in next, blocks do
+			
+			for position, block in next, blocks do
+				segmentList[block.segmentId] = true
 				block:onUpdate(self)
 			end
 		end
 		
 		if updatePhysics ~= false then
-			self:getChunk():refreshSegmentList(blocks)
+			self:getChunk():refreshSegmentList(segmentList)
 		end
 	end
 end
