@@ -120,12 +120,12 @@ local formatDoc = function(dt)
 	dlines[1] = ("### **%s** ( %s )"):format(dt.name, plist1) 
 	dlines[2] = dt.summary .. " " .. table.concat(dt.description, " "):gsub("  ", " ")
 	if plist2 ~= "" then
-		dlines[3] = "**Parameters:**"
+		dlines[3] = "\n\n**Parameters:**"
 		dlines[4] = plist2
 	end
 	
 	if #rlist > 0 then 
-		dlines[#dlines + 1] = "**Returns:**"
+		dlines[#dlines + 1] = "\n\n**Returns:**"
 		dlines[#dlines + 1] = table.concat(rlist, "\n")
 	end
 	
@@ -178,7 +178,7 @@ local generateDocs = function(content)
 	end
 
 	if #docs > 0 then
-		return table.concat(docs, "\n\n\n")
+		return table.concat(docs, "\n\n\n\n\n")
 	else
 		return nil
 	end
@@ -225,7 +225,7 @@ local buildModule = function(modulo, log)
     end
 	
 	if modulo.__docs then
-		local docsComp = table.concat(docs, "\n\n\n") or ""
+		local docsComp = table.concat(docs, "\n\n\n\n\n") or ""
 		local dpath = ("%s/%s.md"):format(modulo.__directory, modulo.__name)
 		local Doc = io.open(dpath, "w")
 		Doc:write(docsComp)
