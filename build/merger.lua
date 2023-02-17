@@ -117,7 +117,7 @@ local formatDoc = function(dt)
 	plist1 = #plist1 > 0 and table.concat(plist1, ", ") or ""
 	plist2 = #plist2 > 0 and table.concat(plist2, "\n") or ""
 	
-	dlines[1] = ("# **%s** ( %s )"):format(dt.name, plist1) 
+	dlines[1] = ("### **%s** ( %s )"):format(dt.name, plist1) 
 	dlines[2] = dt.summary .. " " .. table.concat(dt.description, " "):gsub("  ", " ")
 	if plist2 ~= "" then
 		dlines[3] = "**Parameters:**"
