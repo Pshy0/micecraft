@@ -105,6 +105,16 @@ do
 		return array
 	end
 	
+	table.copykeys = function(t, v)
+		local nt = {}
+		
+		for k in next, t do
+			nt[k] = v
+		end
+		
+		return nt
+	end
+	
 	table.random = function(t, associative)
 		local index
 		if associative or #t <= 0 then

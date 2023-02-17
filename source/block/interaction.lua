@@ -12,7 +12,7 @@ function Block:create(type, foreground, display, update, updatePhysics)
 		
 		do
 			self.type = type
-			self.category = foreground and meta.category or -meta.category
+			self.category = foreground and meta.category or 0
 			
 			self.drop = meta.drop
 			
@@ -27,8 +27,6 @@ function Block:create(type, foreground, display, update, updatePhysics)
 			self.glow = meta.glow
 			self.translucent = meta.translucent
 			
-			self.act = foreground and -meta.category or 0
-			
 			self.sprite = meta.sprite
 			self.shadow = meta.shadow
 			self.lighting  = meta.lighting
@@ -42,6 +40,8 @@ function Block:create(type, foreground, display, update, updatePhysics)
 			self.onContact = meta.onContact
 			self.onUpdate = meta.onUpdate
 		end
+		
+		World.physicsMap[self.y][self.x] = self.category
 		
 		self:removeAllDisplays()
 		self:setDefaultDisplay()
@@ -62,6 +62,8 @@ function Block:destroy(display, update, updatePhysics)
 		
 		self:removeAllDisplays()
 		
+		self.category = 0
+		World.physicsMap[self.y][self.x] = 0
 		if self.foreground then			
 			self.foreground = false
 			self.damage = 0
@@ -121,7 +123,7 @@ do
 					self:addDisplay("damage", 2, image, nil, self.dx, self.dy, nil, nil, 0, 1.0)
 					
 					if display then
-						self:refreshDisplay(2)
+						self:refreshDisplayAt(2)
 					end
 				else
 					self:removeDisplay(2, true)

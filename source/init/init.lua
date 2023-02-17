@@ -12,19 +12,30 @@ end
 
 math.randomseed(os.time())
 
+--- Crashes on the slightlest sign of a global.
 -- We don't want globals in our code. They pollute the global environment,
 -- are prone to cause memory leaks on the Lua VM, make debugging harder,
--- and increases unnecesarily the table acceses. Only Transformice events
--- should be globals, because that's the only way we can receive callbacks.
-setmetatable(_G, {
-	__newindex = function(self, k, v)
-		if k:match("^event.+") then -- It's an Event (duh)
-			rawset(_G, k, v)
-		else -- Not an Event. Bad global !!
-			error(("NO GLOBALS ALLOWED !! Bad global: %q >:("):format(tostring(k)), 2)
+-- and increases unnecessarily the table acceses. Only Transformice events
+-- should be globals, because that's the only way callbacks can be received.
+-- @name _G.__newindex
+-- @param Table:self Global space
+-- @param Any:k Key
+-- @param Any:v Value
+do
+	local rawset = rawset
+	local error = error
+	local setmetatable = setmetatable
+	local tostring = tostring
+	setmetatable(_G, {
+		__newindex = function(self, k, v)
+			if k:match("^event") then -- It's an Event (duh)
+				rawset(self, k, v)
+			else -- Not an Event. Bad global !!
+				error(("NO GLOBALS ALLOWED !! Bad global: %q >:("):format(tostring(k)), 2)
+			end
 		end
-	end
-})
+	})
+end
 --		ALT:	'<C><P Ca="" H="%d" L="%d" /><Z><S></S><D><T X="%d" Y="%d" D="" /></D><O /></Z></C>'
 local xmlLoad = '<C><P Ca="" H="%d" L="%d" /><Z><S></S><D><DS X="%d" Y="%d" /></D><O /></Z></C>'
 
@@ -35,10 +46,14 @@ local Mode = {}
 
 local enum = {}
 
+local Ui = {}
+
 local Block = {}
 Block.__index = Block
+
 local Chunk = {}
 Chunk.__index = Chunk
+
 local World = {}
 
 local Player = {}

@@ -30,7 +30,7 @@ function World:initPhysics()
 	for y = 1, height do
 		pm[y] = {}
 		for x = 1, width do
-			pm[y][x] = pre[y][x]
+			pm[y][x] = 0
 		end
 	end
 end
@@ -41,8 +41,10 @@ function World:initBlocks()
 	
 	local blocks = self.blocks
 	local pre = self.pre
+	local pm = self.physicsMap
 	
 	local bw, bh = self:getBlockDimensions()
+	local ox, oy = self:getEdges()
 	
 	local temp
 	
@@ -51,11 +53,12 @@ function World:initBlocks()
 		for x = 1, width do
 			blockId = blockId + 1
 			temp = pre[y][x]
-			blocks[y][x] = Block:new(
+			blocks[y][x], pm[y][x] = Block:new(
 				blockId,
 				temp.type, temp.tangible,
 				x, y,
-				(x * bw), (y * bh)
+				ox + (x * bw), oy + (y * bh),
+				bw, bh
 			)
 		end
 	end

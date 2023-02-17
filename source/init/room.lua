@@ -24,7 +24,7 @@ function Room:init()
 				if #self.args == 1 then
 					self.worldSeed = enum.community
 				else
-					self.worldSeed = tonumber(self.fullName:match("#micecraft(%d+)") or os.time()
+					self.worldSeed = tonumber(self.fullName:match("#micecraft(%d+)")) or os.time()
 				end
 			else
 				if self.isTribe then
@@ -69,6 +69,8 @@ function Room:newPlayer(playerName)
 		
 		self.activePlayers = self.activePlayers + 1
 	end
+	
+	Room.presencePlayerList[playerName] = true
 end
 
 function Room:playerLeft(playerName)
@@ -79,4 +81,6 @@ function Room:playerLeft(playerName)
 		
 		self.activePlayers = self.activePlayers - 1
 	end
+	
+	Room.presencePlayerList[playerName] = nil
 end

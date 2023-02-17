@@ -124,11 +124,14 @@ do
 end
 
 do
+	function Block:refreshDisplay()
+		return self:hide() and self:display()
+	end
 	
 	local addImage = tfm.exec.addImage
 	local removeImage = tfm.exec.removeImage
 	
-	function Block:refreshDisplay(index)
+	function Block:refreshDisplayAt(index)
 		if index then
 			local sprite = self:getDisplay(index)
 			if sprite then
@@ -148,17 +151,14 @@ do
 				)
 			end
 		else
-			local hidden = self:hide()
-			local displayed = self:display()
-			
-			return (hidden and displayed)
+			self:refreshDisplay()
 		end
 	end
 end
 
 function Block:setDefaultDisplay()
 	if self.type ~= 0 then
-		self:addDisplay("main", 1, self.sprite, nil, self.dx, self.d, REFERENCE_SCALE_X, REFERENCE_SCALE_Y, 0, 1.0)
+		self:addDisplay("main", 1, self.sprite, nil, self.dx, self.dy, REFERENCE_SCALE_X, REFERENCE_SCALE_Y, 0, 1.0)
 		
 		if not self.foreground then
 			self:addDisplay("shadow", 3, self.shadow, nil, self.dx, self.dy, REFERENCE_SCALE_X, REFERENCE_SCALE_Y, 0, 0.33)

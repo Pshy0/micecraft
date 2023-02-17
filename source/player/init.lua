@@ -19,7 +19,7 @@ function Player:new(playerName)
 		isAlive = false,
 		isBanned = false,
 		
-		keys = {}
+		keys = {},
 		
 		dataFile = "",
 		awaitingData = false

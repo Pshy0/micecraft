@@ -63,7 +63,7 @@ function World:encodeMatrix(matrix)
 			if eqcount > 1 then
 				table.insert(tc[y], ("%s|%s%s"):format(math.tobase(tile.type, 64), math.tobase(eqcount, 64), tile.tangible and "+" or "-"))
 			else
-				table.insert(tc[y], ("%s%s"):format(math.tobase(tile.type, 64), tile.tangible and "+" or "-")
+				table.insert(tc[y], ("%s%s"):format(math.tobase(tile.type, 64), tile.tangible and "+" or "-"))
 			end
 			
 			x = x + 1

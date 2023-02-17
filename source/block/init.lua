@@ -1,4 +1,4 @@
-function Block:new(uniqueId, type, foreground, worldX, worldY, displayX, displayY)
+function Block:new(uniqueId, type, foreground, worldX, worldY, displayX, displayY, width, height)
 	
 	local meta = blockMetadata:get(type)
 	
@@ -33,6 +33,14 @@ function Block:new(uniqueId, type, foreground, worldX, worldY, displayX, display
 		cx = 0, -- Chunk X
 		cy = 0, -- Chunk Y
 		
+		dx = displayX,
+		dy = displayY,
+		dxc = 0,
+		dyc = 0,
+		
+		width = width,
+		height = height,
+		
 		sprite = meta.sprite,
 		shadow = meta.shadow,
 		lighting = meta.lighting,
@@ -49,7 +57,7 @@ function Block:new(uniqueId, type, foreground, worldX, worldY, displayX, display
 		removeDisplay = self.removeDisplay,
 		removeAllDisplays = self.removeAllDisplays,
 		refreshDisplay = self.refreshDisplay,
-		setDefaultDisplay = self.setDefaultDisplay
+		setDefaultDisplay = self.setDefaultDisplay,
 		
 		onCreate = meta.onCreate,
 		onPlacement = meta.onPlacement,
@@ -65,7 +73,7 @@ function Block:new(uniqueId, type, foreground, worldX, worldY, displayX, display
 	
 	self:setDefaultDisplay()
 	
-	return this
+	return this, meta.category
 end
 
 do
@@ -100,99 +108,54 @@ do
 		self.onDamage = void
 		self.onContact = void
 		self.onUpdate = void
+		
+		World.physicsMap[self.y][self.x] = 0
 	end
 end
 
 function Block:setRelativeCoordinates(x, y, id, CX, CY, CID)
 	self.cx = x or 0
 	self.cy = y or 0
-	self.uniqueId = id
+	self.chunkUniqueId = id
 	
 	self.chunkX = CX
 	self.chunkY = CY
-	self.chunkUniqueId = CID
-end
-
-function Block:getChunk()
-	return World:getChunk(self.chunkX, self.chunkY, "matrix")
-end
-
-function Block:getBlocksAround(gtype, include)
-	local blocks = {}
-	if gtype == "cross" then
-		for y = -1, 1 do
-			if (y ~= 0) or include then
-				blocks[#blocks + 1] = World:getBlock(self.x, self.y + y, "matrix")
-			end
-		end
-		
-		blocks[#blocks + 1] = World:getBlock(self.x - 1, self.y, "matrix")
-		blocks[#blocks + 1] = World:getBlock(self.x + 1, self.y, "matrix")
-	elseif gtype == "square" then
-		for y = -1, 1 do
-			for x = -1, 1 do
-				if not (x == 0 and y == 0) or include then
-					blocks[#blocks + 1] = World:getBlock(self.x + x, self.y + y, "matrix")
-				end
-			end
-		end
-	end
+	self.chunkId = CID
 	
-	return blocks
-end
-
-function Block:updateEvent(update, updatePhysics)
-	do
-		local blocks = self:getBlocksAround("cross", false)
-			
-		if update ~= false then
-			for block in next, blocks do
-				block:onUpdate(self)
-			end
-		end
-		
-		if updatePhysics ~= false then
-			self:getChunk():refreshSegmentList(blocks)
-		end
-	end
-end
-
-function Block:getPixelCenter()
-	local width, height = World:getBlockDimensions()
-	
-	return self.dx + (width / 2), self.dy + (height / 2)
+	self.dxc = self.dx + (self.width / 2)
+	self.dyc = self.dy + (self.height / 2)
 end
 
 -- REFERENCE FOR METHODS (also failsafe in case it is NIL for some reason)
 
 function Block:onCreate() -- Declare as `onCreate = function(self)`.
-	print("I have been created ^-^")
+	print("Block has been created.")
 end
 
 function Block:onPlacement(player) -- Declare as `onPlacement = function(self, player)`.
-	print("I have been placed by " .. player.name .. " *-*")
+	print("Block has been placed by " .. player.name .. ".")
 end
 
 function Block:onDestroy() -- Declare as `onDestroy = function(self)`.
-	print("I have been destroyed x_x")
+	print("Block has been destroyed.")
 end
 
 function Block:onInteract(player) -- Declare as `onInteract = function(self, player)`.
-	print(player.name .. " wants to interact with me >///<")
+	print(player.name .. " interacted with a block.")
 end
 
 function Block:onHit(player) -- Declare as `onHit = function(self, player)`.
-	print("I have gotten hit by " .. player.name .. " :'c")
+	print("Block has been hit by " .. player.name .. ".")
 end
 
 function Block:onDamage(amount, player) -- Declare as `onDamage = function(self, amount, player)`.
-	print("I have been damaged :C")
+	print("Block has been damaged.")
 end
 
 function Block:onContact(player) -- Declare as `onContact = function(self, player)`.
-	print("I have been contacted by " .. player.name .. " o.o")
+	print("Block has been contacted by " .. player.name .. ".")
 end
 
 function Block:onUpdate(block) -- Declare as `onUpdate = function(self, block)`.
-	print("I have been updated by another block 0_0")
+	print("Block has been updated by another block.")
 end

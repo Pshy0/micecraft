@@ -1,6 +1,7 @@
 do
-	-- Localize functions to reduce direct workload on functions
+	-- Localize standard functions to reduce direct workload on built functions
 	local floor = math.floor
+	local ceil = math.ceil
 	local abs = math.abs
 	local min, max = math.min, math.max
 	local sqrt = math.sqrt
@@ -15,36 +16,40 @@ do
 	local concat = table.concat
 	
 	--- Rounds a number to the nearest integer.
-	-- For numbers will decimal digit under 0.5, it will floor that number, 
+	-- For numbers with decimal digit under 0.5, it will floor that number, 
 	-- and for numbers over 0.5 it will ceil that number.
-	-- @param n The number to round
+	-- @name math.round
+	-- @param Number:n The number to round
 	-- @return `Number` The number rounded.
 	math.round = function(number)
 		return floor(number + 0.5)
 	end
 	
 	--- Restrict the given input between two limits.
-	-- @param number The number to restrict
-	-- @param lower The lower limit
-	-- @param higher The higher limit
+	-- @name math.restrict
+	-- @param Number:number The number to restrict
+	-- @param Number:lower The lower limit
+	-- @param Number:higher The higher limit
 	-- @return `Number` The number between the specified range.
 	math.restrict = function(number, lower, higher)
 		return max(lower, min(number, higher))
 	end
 	
 	--- Returns the distance between two points on a cartesian plane.
-	-- @param ax The horizontal coordinate of the first point
-	-- @param ay The vertical coordinate of the first point
-	-- @param bx The horizontal coordinate of the second point
-	-- @param by The vertical coordinate of the second point
+	-- @name math.pythag
+	-- @param Number:ax The horizontal coordinate of the first point
+	-- @param Number:ay The vertical coordinate of the first point
+	-- @param Number:bx The horizontal coordinate of the second point
+	-- @param Number:by The vertical coordinate of the second point
 	-- @return `Number` The distance between both points.
 	math.pythag = function(ax, ay, bx, by)
 		return sqrt((bx - ax)^2 + (by - ay)^2)
 	end
 	
 	--- Returns the absolute difference between two numbers.
-	-- @param a The first number
-	-- @param b The second number
+	-- @name math.udist
+	-- @param Number:a The first number
+	-- @param Number:b The second number
 	-- @return `Number` The absolute difference.
 	math.udist = function(a, b)
 		return abs(a - b)
@@ -52,8 +57,9 @@ do
 	
 	--- Rounds a number to the specified level of precision.
 	-- The precision is the amount of decimal points after the integer part.
-	-- @param number The number to correct precision
-	-- @param precision The decimal digits of precision that this number will have
+	-- @name math.precision
+	-- @param Number:number The number to correct precision
+	-- @param Int:precision The decimal digits of precision that this number will have
 	-- @return `Number` The number with the corrected precision.
 	math.precision = function(number, precision)
 		local elevator = 10^precision
@@ -63,8 +69,9 @@ do
 	
 	--- Converts a number to a string representation in another base.
 	-- The base can be as lower as 2 or as higher as 64, otherwise it returns nil.
-	-- @param number The number to convert
-	-- @param base The base to convert this number to
+	-- @name math.tobase
+	-- @param Number:number The number to convert
+	-- @param Int:base The base to convert this number to
 	-- @return `String` The number converted to the specified base.
 	math.tobase = function(number, base)
 		base = base or 10
@@ -100,8 +107,9 @@ do
 	--- Converts a string to a number, if possible.
 	-- The base can be as lower as 2 or as higher as 64, otherwise it returns nil.
 	-- When bases are equal or lower than 36, it uses the native Lua `tonumber` method.
-	-- @param str The string to convert
-	-- @param base The base to convert this string to number
+	-- @name math.tonumber
+	-- @param String:str The string to convert
+	-- @param Int:base The base to convert this string to number
 	-- @return `String` The string converted to number from the specified base.
 	math.tonumber = function(str, base)
 		if base <= 36 then
@@ -124,9 +132,10 @@ do
 	end
 	
 	--- Interpolates two points with a cosine curve.
-	-- @param a First Point
-	-- @param b Second point
-	-- @param s Curve size
+	-- @name math.cosint
+	-- @param Number:a First Point
+	-- @param Number:b Second point
+	-- @param Number:s Curve size
 	-- @return `Number` Resultant point with value interpolated through cosine function.
 	math.cosint = function(a, b, s)
 		local f = (1 - cos(s * pi)) * 0.5
@@ -135,12 +144,19 @@ do
 	end
 	
 	--- Generates a Height Map based on the current `randomseed`.
-	-- @param amplitude How tall can a wave be
-	-- @param waveLenght How wide will a wave be
-	-- @param width How large should the height map be
+	-- @name math.heightMap
+	-- @param Number:amplitude How tall can a wave be
+	-- @param Number:waveLenght How wide will a wave be
+	-- @param Int:width How large should the height map be
+	-- @param Number:offset Overall height for which map will be increased
+	-- @param Number:lower The lower limit of height
+	-- @param Number:higher The higher limit of height
 	-- @return `Table` An array that contains each point of the height map.
 	local cosint = math.cosint
-	math.heightMap = function(amplitude, waveLenght, width)
+	local restrict = math.restrict
+	math.heightMap = function(amplitude, waveLenght, width, offset, lower, higher)
+		lower = lower or 0
+		higher = higher or amplitude
 		local heightMap = {}
 		local a, b = random(), random()
 		
@@ -155,11 +171,41 @@ do
 				y = cosint(a, b, (x % waveLenght) / waveLenght) * amplitude
 			end
 			
-			heightMap[x + 1] = y
+			heightMap[x + 1] = restrict(y + offset, lower, higher)
 			
 			x = x + 1
 		end
 		
 		return heightMap
+	end
+	
+	--- Stretches a height map, or array with numerical values.
+	-- @name math.stretchMap
+	-- @param Table:ls The array to stretch.
+	-- @param Int:mul How much should it be stretched
+	-- @return `Table` The array stretched
+	math.stretchMap = function(ls, mul)
+		local ex = {}
+		
+		local k, mod
+		
+		local a, b = 0, 0
+		
+		for i = 1, #ls * mul do
+			k = ceil(i / mul)
+			
+			mod = (i-1) % mul
+			
+			if mod == 0 then
+				a = b
+				b = ls[k]
+				
+				ex[#ex + 1] = a
+			else
+				ex[#ex + 1] = cosint(a,	b, mod / mul)
+			end
+		end
+		
+		return ex
 	end
 end

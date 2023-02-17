@@ -3,15 +3,17 @@
 -- runtime and may be used to verify various other things. It should
 -- only be called on pre-start, because it doesn't check if previous
 -- values already exist, and may delete all of them.
+-- @name Module:init
+-- @param Unknown:apiVersion The **Module API** version were this Module was last updated to
+-- @param Unknown:tfmVersion The **Transformice** version were this Module was last updated to
 function Module:init(apiVersion, tfmVersion)
-	
 	self.apiVersion = ""
 	self.tfmVersion = ""
 	self:assertVersion(apiVersion, tfmVersion)
 	
 	self.eventList = {}
 	self.currentCycle = 0
-	self.cycleDuration = {}
+	self.cycleDuration = 4100
 	
 	self.runtimeLog = {}
 	self.currentRuntime = 0
@@ -25,61 +27,89 @@ end
 --- Asserts if API version matches the defined version for this Module.
 -- In case it doesn't, a warning will be displayed for players to
 -- inform the developer. 
--- @param apiVersion The defined API version that this Module has been updated for.
--- @param tfmVersion The defined TFM version.
--- @return `Boolean` Whether the versions defined match 
-function Module:assertVersion(apiVersion, tfmVersion)
+-- @name Module:assertVersion
+-- @param Unknown:apiVersion The defined API version that this Module has been updated for.
+-- @param Unknown:tfmVersion The defined TFM version.
+-- @return `Boolean` Whether the versions defined match
+do
 	local misc = tfm.get.misc
-	
-	self.apiVersion = apiVersion or misc.apiVersion
-	self.tfmVersion = tfmVersion or misc.transformiceVersion
-	
-	local apiMatch = (self.apiVersion == misc.apiVersion)
-	local tfmMatch = (self.tfmVersion == misc.transformiceVersion)
-	
-	
-	if not apiMatch then
-		self:emitWarning(3, "Module API version mismatch")
+	function Module:assertVersion(apiVersion, tfmVersion)		
+		self.apiVersion = apiVersion or misc.apiVersion
+		self.tfmVersion = tfmVersion or misc.transformiceVersion
+		
+		local apiMatch = (self.apiVersion == misc.apiVersion)
+		local tfmMatch = (self.tfmVersion == misc.transformiceVersion)
+		
+		if not apiMatch then
+			self:emitWarning(3, "Module API version mismatch")
+		end
+		
+		if not tfmMatch then
+			self:emitWarning(4, "Transformice version mismatch")
+		end
+		
+		return (apiMatch and tfmMatch)
 	end
-	
-	if not tfmMatch then
-		self:emitWarning(4, "Transformice version mismatch")
-	end
-	
-	return (apiMatch and tfmMatch)
 end
 
---- Emits a warning, as a message on chat, with the issue provided.
--- @param severity How severe is the warning. Accepts values from 1 to 4, being 1 the most severe and 4 the least severe.
--- @param message The warning message to display.
-function Module:emitWarning(severity, message)
-	message = message or "unknown"
-	severity = severity or 4
-	local color = ({"R", "O", "J", "V"})[severity] or "V"
-	
-	tfm.exec.chatMessage(("<%s>[Warning]</%s> <N>%s</N>"):format(color, color, message))
-end
-
---- Triggers an exit of the proccess.
--- It should only be called on special situations, as a server restart
--- or a module crash. It will automatically save all the data that
--- needs to be saved, in case the unload is 'handled'.
--- @param handled Wheter the unloading is caused by a handled situation or not.
-function Module:unload(handled)
-	if handled then
-		-- Save Data
-	else -- UNHANDLED
-		self:emitWarning(1, "The Module has been unloaded due to an uncatched exception.")
+do
+	local colors = {
+		"R",
+		"O",
+		"J",
+		"V"
+	}
+	--- Emits a warning, as a message on chat, with the issue provided.
+	-- @name Module:emitWarning
+	-- @param Int:severity How severe is the warning. Accepts values from 1 to 4, being 1 the most severe and 4 the least severe.
+	-- @param String:message The warning message to display.
+	function Module:emitWarning(severity, message)
+		message = message or "unknown"
+		severity = severity or 4
+		local color = colors[severity] or "V"
+		
+		tfm.exec.chatMessage(("<%s>[Warning]</%s> <N>%s</N>"):format(color, color, message))
 	end
-	
-	system.newTimer(function(id)
-		system.exit()
-	end, 500, false)
 end
 
+do
+	--- Triggers an exit of the proccess.
+	-- It should only be called on special situations, as a server restart
+	-- or a module crash. It will automatically save all the data that
+	-- needs to be saved, in case the unload is 'handled'.
+	-- @name Module:unload
+	-- @param Boolean:handled Wheter the unloading is caused by a handled situation or not.
+	local newTimer = system.newTimer
+	local exit = system.exit
+	function Module:unload(handled)
+		if handled then
+			-- Save Data of everyone
+		else
+			self:emitWarning(1, "The Module has been unloaded due to an uncatched exception.")
+		end
+		
+		newTimer(function(id)
+			exit()
+		end, 500, false)
+	end
+end
+
+--- Callback when the Module crashes for any error.
+-- @name Module:onError
+-- @param String:errorMessage The reason of the error.
+-- @param Any:... Extra arguments
 function Module:onError(errorMessage, ...)
+	-- Save data
+	self:unload(true)
 end
 
+--- Throws an exception report.
+-- The exception can either be fatal or not, and the handling of
+-- the Module against that exception will change accordingly.
+-- @name Module:throwException
+-- @param Boolean:fatal Wheter the Exception happened on a sensitive part of the Module or not
+-- @param String:errorMessage The reason for this Exception
+-- @param Any:... Extra arguments
 function Module:throwException(fatal, errorMessage, ...) -- To do
 	if fatal then
 		self:onError(errorMessage, ...)
@@ -89,7 +119,8 @@ function Module:throwException(fatal, errorMessage, ...) -- To do
 end
 
 
-local Event = {}
+local Event = {} -- Should this class be documented? No possible uses outside of **Module**...
+Event.__index = Event
 
 do
 	local nativeEvents = {
@@ -147,8 +178,9 @@ function Event:append(callback)
 end
 
 do
-	local currentTime = os.time
-	
+	local time = os.time
+	local next = next
+	local pcall = pcall
 	
 	function Event:triggerUncount(...)
 		local ok, result
@@ -163,37 +195,39 @@ do
 			end
 		end
 		
-		return true, ":D"
+		return true, "success"
 	end
 	
 	function Event:triggerCount(...)
 		local ok, result, startTime
 		for index, instance in next, self.calls do
 			if not Module.isPaused then
-				startTime = currentTime()
+				startTime = time()
 				ok, result = pcall(instance, ...)
 				
 				if ok then
-					Module:increaseRuntime(currentTime() - startTime)
+					Module:increaseRuntime(time() - startTime)
 				else
 					return false, result
 				end
 			end
 		end
 		
-		return true, ":D"
+		return true, "success"
 	end
 end
 
 -- Gets the Event object by the event name provided.
--- @param eventName The name of the Event to get its object from.
+-- @name Module:getEvent
+-- @param String:eventName The name of the Event to get its object from.
 -- @return `Event|nil` The Event object, if it exists.
 function Module:getEvent(eventName)
 	return self.eventList[eventName]
 end
 
 -- Tells if an Event has been defined on the module.
--- @param eventName The name of the Event to assert.
+-- @name Module:hasEvent
+-- @param String:eventName The name of the Event to assert.
 -- @return `Boolean` Whether the Event exists or not.
 function Module:hasEvent(eventName)
 	return not not self:getEvent(eventName)
@@ -205,8 +239,9 @@ end
 -- on the order it is defined. Otherwise it doesn't exist, an
 -- Event object will be created, and the Event will be defined on
 -- the Global Space.
--- @param eventName The name of the Event.
--- @param callback The callback to trigger.
+-- @name Module:on
+-- @param String:eventName The name of the Event.
+-- @param Function:callback The callback to trigger.
 -- @return `Boolean` Whether a new Event object was created or not.
 -- @return `Number` The position of the callback in the calls list.
 function Module:on(eventName, callback)
@@ -216,9 +251,9 @@ function Module:on(eventName, callback)
 	if not self:hasEvent(eventName) then
 		createdNewObject = self:addEvent(eventName)
 		
-		_G[eventFullName] = function(...)
+		rawset(_G, eventFullName, function(...)
 			self:trigger(eventName, ...)
-		end
+		end)
 	end
 	
 	position = self:getEvent(eventName):append(callback)
@@ -229,11 +264,12 @@ end
 --- Adds an Event listener.
 -- It will create the Event object required, with the event name
 -- that has been provided.
--- @param eventName The name of the Event to create.
+-- @name Module:addEvent
+-- @param String:eventName The name of the Event to create.
 -- @return `Boolean` Whether or not a new Event object has been created.
 function Module:addEvent(eventName)
 	if not self:hasEvent(eventName) then
-		self.eventList[eventName] = Event.new(eventName)
+		self.eventList[eventName] = Event:new(eventName)
 		
 		return true
 	end
@@ -243,35 +279,46 @@ end
 
 do
 	local critical = {
+		-- API
+		["FileLoaded"] = true,
 		["Loop"] = true,
 		["NewGame"] = true,
 		["NewPlayer"] = true,
 		["PlayerLeft"] = true,
-		["PlayerDataLoaded"] = true
+		["PlayerDataLoaded"] = true,
+		
+		-- Module
+		["Pause"] = true,
+		["Resume"] = true,
  	}
 	
 	--- Triggers the callbacks of an event emmited.
 	-- This function should not be called other than inside a true event
 	-- definition. For the sake of performance, it assumes that the event
 	-- provided already exists, and thus doesn't check for a nil listener.
-	-- @param eventName The event to trigger.
+	-- @name Module:trigger
+	-- @param String:eventName The event to trigger.
 	-- @return `Boolean` Whether the Event triggered without errors.
 	function Module:trigger(eventName, ...)
-		local ok, result = self:getEvent(eventName):trigger(...)
-		
-		if not ok then
-			local isFatal = not not critical[eventName]
-			self:throwException(isFatal, result)
+		local event = self:getEvent(eventName)
+		if event then
+			local ok, result = event:trigger(...)
+			
+			if not ok then
+				local isFatal = not not critical[eventName]
+				self:throwException(isFatal, result)
+			end
+			
+			return ok
 		end
-		
-		return ok
 	end
 end
 
 --- Increases the runtime counter of the Module.
 -- It will also check if the runtime reaches the limit established for the
 -- module, and trigger a `Module Pause` in such case.
--- @param increment The amount of milliseconds to increment into the counter.
+-- @name Module:increaseRuntime
+-- @param Int:increment The amount of milliseconds to increment into the counter.
 -- @return `Boolean` Whether the increment in runtime has caused the Module to pause.
 function Module:increaseRuntime(increment)
 	self.currentRuntime = self.currentRuntime + increment
@@ -290,33 +337,39 @@ end
 -- This function is automatically called by a runtime check when an event
 -- triggers, however, it `should` be safe to call it dinamically.
 -- After pausing, the Module will automatically ressume on the next cycle.
+-- @name Module:pause
 -- @return `Number` The time it will take to ressume the Module, in milliseconds.
-function Module:pause()
-	local time = math.max(500, ((self.currentCycle + 1.25) * self.cycleDuration) - currentTime())
-	
-	self.isPaused = true
-	
-	-- Pause players and objects
-	
-	system.newTimer(function(id)
-		self:continue()
-	end, time, false)
+do
+	local max = math.max
+	local newTimer = system.newTimer
+	local time = os.time
+	function Module:pause()
+		local time = max(500, ((self.currentCycle + 1.25) * self.cycleDuration) - time())
+		
+		self.isPaused = true
+		
+		self:trigger("Pause")
+		
+		newTimer(function(id)
+			self:continue()
+		end, time, false)
 
-	return time
+		return time
+	end
 end
-
 --- Continues the Module execution.
 -- All events ressume listening, as well as players take back their movility.
 -- It will check if the Module is already paused, so it is safe to call it
 -- without previous checks.
+-- @name Module:continue
 -- @return `Boolean` Whether the Module has been resumed or not.
 function Module:continue()
 	if self.isPaused then
 		self.isPaused = false
 		
-		-- trigger appended events
-		
 		self:setCycle()
+		
+		self:trigger("Resume")
 		
 		return true
 	end
@@ -327,6 +380,7 @@ end
 --- Sets the appropiate Cycle of runtime checking.
 -- Whenever a new cycle occurs, the runtime counter will reset,
 -- and its fingerprint will log.
+-- @name Module:setCycle
 -- @return `Number` The current cycle.
 function Module:setCycle()
 	local lastCycle = self.currentCycle
@@ -354,6 +408,10 @@ function Module:getDebugInfo(asText)
 	
 end
 
+--- Seeks for the player with the lowest latency to make them the sync, or establishes the selected one.
+-- @name Module:setSync
+-- @param String:playerName The Player to set as sync, if not provided then it will be picked automatically
+-- @return `String` The new sync.
 function Module:setSync(playerName) -- Seeks for the player with the lowest latency for syncing.
 	if playerName then
 		if not Room:hasPlayer(playerName) then
@@ -375,6 +433,8 @@ function Module:setSync(playerName) -- Seeks for the player with the lowest late
 	end
 	
 	tfm.exec.setPlayerSync(playerName)
+	
+	return playerName
 end
 
 function Module:newMode(modeName, constructor)
