@@ -62,9 +62,10 @@ Chunk.__index = Chunk
 local World = {
 	physicsMap = {},
 	blocks = {},
-	chunks = {},
-	pre = {}
+	chunks = {}
 }
+
+local Field = {}
 
 local MetaData = {}
 MetaData.__index = MetaData

@@ -4,13 +4,13 @@ Module:newMode("default", function(this, g)
 		world:setPhysicsMode("rectangle_detailed")
 	end
 	
-	function this:setWorld(world)
+	function this:setWorld(field)
 		local l = {32}
 		for i=2, 64 do
 			l[i] = l[i-1] + (math.random(-1, 1))
 		end
 		
-		world.pre:setLayer({
+		field:setLayer({
 			overwrite = true,
 			exclusive=true,
 			dir = {

@@ -46,7 +46,7 @@ local fileList = {
 		"init",
 		"env",
 		"interaction",
-		"generation",
+		"field",
 		"physics",
 		--"biome",
 		"encoding"

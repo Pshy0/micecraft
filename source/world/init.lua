@@ -1,31 +1,5 @@
-function World:generateNewMapData()
-	local width, height = self:getBlocks()
-	
-	local pre = self.pre
-	
-	for y = 1, height do
-		pre[y] = {}
-		for x = 1, width do
-			pre[y][x] = {type=0, tangible=false}
-		end
-	end
-	
-	function pre:assignTemplate(x, y, template)
-		if template.type ~= nil then
-			self[y][x].type = template.type
-		end
-		
-		if template.tangible ~= nil then
-			self[y][x].tangible = template.tangible
-		end
-	end
-end
-
-function World:initPhysics()
-	local width, height = self:getBlocks()
-	
+function World:initPhysics(width, height)
 	local pm = self.physicsMap
-	local pre = self.pre
 	
 	for y = 1, height do
 		pm[y] = {}
@@ -35,12 +9,11 @@ function World:initPhysics()
 	end
 end
 
-function World:initBlocks()
-	local width, height = self:getBlocks()
+function World:initBlocks(width, height)
 	local blockId = 0
 	
 	local blocks = self.blocks
-	local pre = self.pre
+	local field = Field
 	local pm = self.physicsMap
 	
 	local bw, bh = self:getBlockDimensions()
@@ -53,7 +26,7 @@ function World:initBlocks()
 		for x = 1, width do
 			blockId = blockId + 1
 			
-			temp = pre[y][x]
+			temp = field[y][x]
 			
 			blocks[y][x], pm[y][x] = Block:new(
 				blockId,
@@ -95,11 +68,12 @@ function World:init()
 	self:setPhysicsMode()
 	local mode = Module:getMode()
 	
-	self:generateNewMapData()
+	local width, height = self:getBlocks()
+	Field:generateNew(width, height)
 	
-	mode:setWorld(self)
+	mode:setWorld(Field)
 	
-	self:initPhysics()
-	self:initBlocks()
+	self:initPhysics(width, height)
+	self:initBlocks(width, height)
 	self:initChunks()
 end

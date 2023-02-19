@@ -1,4 +1,24 @@
-function World.pre:setLayer(layer, heightMap)
+function Field:generateNew(width, height)	
+	for y = 1, height do
+		self[y] = {}
+		for x = 1, width do
+			self[y][x] = {type=0, tangible=false}
+		end
+	end
+end
+
+
+function Field:assignTemplate(x, y, template)
+	if template.type ~= nil then
+		self[y][x].type = template.type
+	end
+	
+	if template.tangible ~= nil then
+		self[y][x].tangible = template.tangible
+	end
+end
+
+function Field:setLayer(layer, heightMap)
 	local width, height = World:getBlocks()
 	local dir = layer.dir
 	local overwrite = layer.overwrite
@@ -32,7 +52,7 @@ function World.pre:setLayer(layer, heightMap)
 	end
 end
 
-function World.pre:setHeightMap(mapInfo)
+function Field:setHeightMap(mapInfo)
 	local dir = mapInfo.dir
 	local heightMap = mapInfo.heightMap
 	local loops = mapInfo.loops
@@ -80,7 +100,7 @@ end
 
 -- To Do: Add 2D Noise parser
 
-function World.pre:setNoiseMap(mapInfo)
+function Field:setNoiseMap(mapInfo)
 	local noiseMap = mapInfo.noiseMap
 	local dir = mapInfo.dir
 
