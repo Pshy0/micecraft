@@ -65,6 +65,8 @@ function Room:newPlayer(playerName)
 	if not self:hasPlayer(playerName) then
 		self.playerList[playerName] = Player:new(playerName)
 		
+		system.bindMouse(playerName, true)
+		
 		self:getPlayer(playerName):loadData()
 		
 		self.activePlayers = self.activePlayers + 1

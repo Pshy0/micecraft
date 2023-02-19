@@ -45,3 +45,7 @@ do
 		end
 	end
 end
+
+function World:setPhysicsMode(physicsMode)
+	self.physicsMode = physicsMode or self.physicsMode or "rectangle_detailed"
+end

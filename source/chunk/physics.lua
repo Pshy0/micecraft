@@ -55,10 +55,10 @@ do
 		[enum.category.cobweb] = {type=15, friction=0.00, restitution=0.00, collides=false}, -- Cobweb
 		[enum.category.acid]= {type=19, friction=20.0, restitution=0.00, collides=true}, -- Acid
 	}
-	catinfo.default = 1
+	catinfo.default = catinfo[enum.category.default]
 	
 	function Segment:setBlocksState(own)
-		local id = own and self.id or 0
+		local id = own and self.uniqueId or 0
 		local bm = World.blocks
 		for y = self.ys, self.ye do
 			for x = self.xs, self.xe do
@@ -68,7 +68,7 @@ do
 	end
 	
 	function Segment:setBodydef()
-		local catdef = catinfo[self.category] or catinfo.default
+		local catdef = catinfo[self.category] or catinfo.default or {}
 		
 		local w = self.width * self.bw
 		local h = self.height * self.bh
@@ -98,13 +98,17 @@ do
 	local addPhysicObject = tfm.exec.addPhysicObject
 	local removePhysicObject = tfm.exec.removePhysicObject
 	function Segment:setState(active)
-		if active then
-			addPhysicObject(self.presenceId, self.x, self.y, self.bodydef)
+		if active == nil then
+			self:reload()
 		else
-			removePhysicObject(self.presenceId)
+			if active then
+				addPhysicObject(self.presenceId, self.x, self.y, self.bodydef)
+			else
+				removePhysicObject(self.presenceId)
+			end
+			
+			self.state = active
 		end
-		
-		self.state = active
 	end
 	
 	local addImage, removeImage = tfm.exec.addImage, tfm.exec.removeImage
@@ -115,13 +119,13 @@ do
 		
 		if display then
 			self.imageId = addImage(
-				"TO DEFINE", 
+				"1866a699d14.png", 
 				"!9999999", 
 				self.x, self.y, 
 				nil, 
-				self.bodydef.width,
-				self.bodydef.height,
-				0, 0.67,
+				self.width * REFERENCE_SCALE_X,
+				self.height * REFERENCE_SCALE_Y,
+				0, 0.33,
 				0.5, 0.5,
 				false
 			)
@@ -137,67 +141,124 @@ do
 		self:setState(false)
 		self:setDebugDisplay(false)
 
-		local pm = World.physicsMap
-		local bm = World.blocks
+		local physicsMap = World.physicsMap
+		local blocksMap = World.blocks
 		for y = self.ys, self.ye do
 			for x = self.xs, self.xe do
-				pm[y][x] = abs(pm[y][x])
-				bm[y][x].segmentId = 0
+				physicsMap[y][x] = abs(physicsMap[y][x])
+				blocksMap[y][x].segmentId = 0
 			end
 		end
 		
 		return self.xs, self.ys, self.xe, self.ye, self.category
 	end
 	
+	--- Creates a new Segment object, with the description provided
+	-- @name Chunk:setSegment
+	-- @param Table:description The description for the Segment to be created
 	function Chunk:setSegment(description)
 		local segmentId = description.block.chunkUniqueId
 		
 		self.segments[segmentId] = Segment:new(description, description.block, self)
 	end
 	
+	--- Deletes a Segment from the Chunk.
+	-- All blocks for which this Segment was attached will be deattached and
+	-- their physic state will be reset.
+	-- @name Chunk:deleteSegment
+	-- @param Int:segmentId The identifier of the Segment
+	-- @return `Int` The left-most block coordinate of the Segment
+	-- @return `Int` The top-most coordinate
+	-- @return `Int` The right-most coordinate
+	-- @return `Int` The down-most coordinate
+	-- @return `Int` The category that this segment had
 	function Chunk:deleteSegment(segmentId)
 		local segment = self.segments[segmentId]
-		local a, b, c, d, cat
+		local xStart, yStart, xEnd, yEnd, category
 		if segment then
-			a, b, c, d, cat = segment:free()
+			xStart, yStart, xEnd, yEnd, category = segment:free()
 		end
 		
 		self.segments[segmentId] = nil
 		
-		return a, b, c, d, cat
+		return xStart, yStart, xEnd, yEnd, category
 	end
 	
-	function Chunk:getCollisions(mode, xStart, xEnd, yStart, yEnd, cats)
+	--- Gets the collisions from a Chunk.
+	-- For blocks that don't have a segment assigned, it will calculate their
+	-- collisions and assign them a new Segment.
+	-- @name Chunk:getCollisions
+	-- @param String:mode The coordinate calculation mode
+	-- @param Int:xStart The left-most block coordinates to calculate
+	-- @param Int:xEnd The right-most coordinates
+	-- @param Int:yStart The top-most coordinates
+	-- @param Int:yEnd The down-most coordinates
+	-- @param Table:categories A list with the categories that should be matched
+	-- @return `Table` A list with new Segments created
+	function Chunk:getCollisions(mode, xStart, xEnd, yStart, yEnd, categories)
 		mode = mode or "rectangle_detailed"
-		local method = World.physicsMap[mode]
 		
-		local seglist = method(World.physicsMap, xStart or self.xf, xEnd or self.xb, yStart or self.yf, yEnd or self.yb, cats)
+		local seglist = World.physicsMap[mode](World.physicsMap,
+			xStart or self.xf,
+			xEnd or self.xb,
+			yStart or self.yf,
+			yEnd or self.yb,
+			categories
+		)
 		
+		local newEntries = {}
 		for _, segment in ipairs(seglist) do
 			self:setSegment(segment)
+			newEntries[segment.block.chunkUniqueId] = true
 		end
+		
+		return newEntries
 	end
 	
+	
+	--- Sets the state for the physics of the Chunk or some of its segments.
+	-- @name Chunk:setPhysicState
+	-- @param Boolean:active Whether the collisions should be active or not
+	-- @param Table:segmentList An associative list with the Segments that should change their physic state
+	-- @return `Boolean` The state of the physics in the Chunk
 	function Chunk:setPhysicState(active, segmentList)
 		if segmentList then
-			local segment
-			for segmentId, _ in next, segmentList do
-				segment = self.segments[segmentId]
-				if segment then
-					segment:setState(active)
+			if active == self.collisionActive then
+				local segment
+				
+				for segmentId, _ in next, segmentList do
+					segment = self.segments[segmentId]
+					
+					if segment then
+						segment:setState(active)
+					end
 				end
 			end
 		else
 			for _, segment in next, self.segments do
 				segment:setState(active)
 			end
+			
+			self.collisionActive = active
 		end
+		
+		return self.collisionActive
 	end
 	
+	--- Sets the Collisions for the Chunk.
+	-- This is just an interface function that manages the interactions between
+	-- players and the Chunk, to ensure no innecessary calls for players that had
+	-- the Chunk already loaded.
+	-- @name Chunk:setCollisions
+	-- @param Boolean|Nil:active Sets the collision state. If nil then a reload will be performed for all players
+	-- @param String|Nil:targetPlayer The target that asks for the collision update. If nil then player check wont be accounted
+	-- @return `Boolean` Whether the specified action happened or not
 	function Chunk:setCollisions(active, targetPlayer)
 		if active == nil then
 			self:setCollisions(false, nil)
 			self:setCollisions(true, nil)
+			
+			return true
 		else
 			local goAhead = false
 			if targetPlayer and active then
@@ -205,42 +266,65 @@ do
 				self.collidesTo[targetPlayer] = active
 			else
 				goAhead = true
-				self.collidesTo = copykeys(Room.presencePlayerList, active)
+				self.collidesTo = copykeys(Room.presencePlayerList, not not active)
 			end
 			
 			if goAhead then
-				self:setPhysicsState(active)
+				self:setPhysicState(active)
 			end
+			
+			self:setUnloadDelay(240, "physics")
+			
+			return goAhead
 		end
 	end
 	
-	function Chunk:refreshPhysics(mode, segmentRange, update)
-		segmentRange = segmentRange or keys(self.segments)
+	--- Recalculates the collisions of the given segments, or the whole chunk.
+	-- @name Chunk:refreshPhysics
+	-- @param String:mode The algorithm to calculate collisions with
+	-- @param Table:segmentList An associative Table with all the segments that need their physics to be reloaded
+	-- @param Boolean:update Whether 
+	-- @param Table:origin A table with the strucutre `{xStart=Int, xEnd=Int, yStart=Int, yEnd=Int, category=Int}` that corresponds to the Block(s) that asked for refresh
+	function Chunk:refreshPhysics(mode, segmentList, update, origin)
+		segmentList = segmentList or copykeys(self.segments, true)
 		local segment
 		
 		local xs, ys, xe, ye, catlist = self.xb, self.yb, self.xf, self.yf, {}
-		
-		local a, b, c, d, cat
-		
-		for _, segmentId in next, segmentRange do
-			a, b, c, d, cat = self:deleteSegment(segmentId)
-			if cat ~= 0 then
-				catlist[cat] = true
-			end
-			
-			xs = min(xs, a)
-			ys = min(ys, b)
-			xe = max(xe, c)
-			ye = max(ye, d)
+		if origin then
+			xs = origin.xStart
+			xe = origin.xEnd
+			ys = origin.yStart
+			ye = origin.yEnd
+			catlist[origin.category] = true
 		end
 		
-		self:getCollisions(mode, xs, ys, xe, ye, keys(catlist))
+		local xStart, yStart, xEnd, yEnd, category
+		
+		for segmentId, _ in next, segmentList do
+			xStart, yStart, xEnd, yEnd, category = self:deleteSegment(segmentId)
+			if xStart and yStart and xEnd and yEnd and category then
+				if category ~= 0 then
+					catlist[category] = true
+				end
+				
+				xs = min(xs, xStart)
+				ys = min(ys, yStart)
+				xe = max(xe, xEnd)
+				ye = max(ye, yEnd)
+			end
+		end
+		
+		local list = self:getCollisions(mode, xs, ys, xe, ye, catlist)
 		
 		if update then
-			self:setCollisions(true, nil)
+			self:setPhysicState(true, list)
 		end
 	end
 	
+	--- Empties a Chunk.
+	-- All blocks from this Chunk will become **void**, their displays will be hidden and it
+	-- will not have collisions.
+	-- @name Chunk:clear
 	function Chunk:clear()
 		local matrix = World.blocks
 		for y = self.yf, self.yb do

@@ -17,7 +17,7 @@ function Block:create(type, foreground, display, update, updatePhysics)
 		self.timestamp = os.time()
 		
 		if self.eventTimer then
-			self.eventTimer = Timer.remove(self.eventTimer)
+			self.eventTimer = Tick:removeTask(self.eventTimer)
 		end
 		
 		do
@@ -51,11 +51,11 @@ function Block:create(type, foreground, display, update, updatePhysics)
 			self.onUpdate = meta.onUpdate
 		end
 		
-		World.physicsMap[self.y][self.x] = self.category
+		World.physicsMap[self.y][self.x] = foreground and self.category or 0
 		
 		self:removeAllDisplays()
 		self:setDefaultDisplay()
-
+		
 		if display then
 			self:refreshDisplay()
 		end
@@ -71,30 +71,35 @@ end
 -- @param Boolean:display Whether the new state should be automatically displayed
 -- @param Boolean:update Whether the nearby Blocks should receive the `Block:onUpdate` event
 -- @param Boolean:updatePhysics Whether the nearby physics should adjust automatically
-function Block:destroy(display, update, updatePhysics)
-	if self.type ~= 0 then
-		self.timestamp = currentTime()
-		
-		self:onDestroy()
-		
-		self:removeAllDisplays()
-		
-		self.category = 0
-		World.physicsMap[self.y][self.x] = 0
-		if self.foreground then			
-			self.foreground = false
-			self.damage = 0
+do
+	local time = os.time
+	local abs = math.abs
+	function Block:destroy(display, update, updatePhysics)
+		if self.type ~= 0 then
+			self.timestamp = time()
 			
-			self:setDefaultDisplay()
-		else
-			self:setVoid()
+			self:onDestroy()
+			
+			self:removeAllDisplays()
+			
+			self.category = 0
+			
+			if self.foreground then
+				World.physicsMap[self.y][self.x] = 0 -- abs(World.physicsMap[self.y][self.x])
+				self.foreground = false
+				self.damage = 0
+				
+				self:setDefaultDisplay()
+			else
+				self:setVoid()
+			end
+			
+			if display then
+				self:refreshDisplay()
+			end
+			
+			self:updateEvent(update, updatePhysics)
 		end
-		
-		if display then
-			self:refreshDisplay()
-		end
-		
-		self:updateEvent(update, updatePhysics)
 	end
 end
 

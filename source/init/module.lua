@@ -70,7 +70,9 @@ do
 		severity = severity or 4
 		local color = colors[severity] or "V"
 		
-		tfm.exec.chatMessage(("<%s>[Warning]</%s> <N>%s</N>"):format(color, color, message))
+		local announce = ("<%s>[Warning]</%s> <N>%s</N>"):format(color, color, message)
+		tfm.exec.chatMessage(announce)
+		print(announce)
 	end
 end
 
@@ -124,6 +126,28 @@ local Event = {} -- Should this class be documented? No possible uses outside of
 Event.__index = Event
 
 do
+		local time = os.time
+	local next = next
+	local pcall = pcall
+	local rawget = rawget
+	local rawset = rawset
+	local max = math.max
+	local newTimer = system.newTimer
+	
+	local critical = {
+		-- API
+		["FileLoaded"] = true,
+		["Loop"] = true,
+		["NewGame"] = true,
+		["NewPlayer"] = true,
+		["PlayerLeft"] = true,
+		["PlayerDataLoaded"] = true,
+		
+		-- Module
+		["Pause"] = true,
+		["Resume"] = true,
+ 	}
+	
 	local nativeEvents = {
 		["ChatCommand"] = true,
 		["ChatMessage"] = true,
@@ -170,18 +194,12 @@ do
 		
 		return this
 	end
-end
 
-function Event:append(callback)
-	self.calls[#self.calls + 1] = callback
-	
-	return #self.calls
-end
-
-do
-	local time = os.time
-	local next = next
-	local pcall = pcall
+	function Event:append(callback)
+		self.calls[#self.calls + 1] = callback
+		
+		return #self.calls
+	end
 	
 	function Event:triggerUncount(...)
 		local ok, result
@@ -216,82 +234,74 @@ do
 		
 		return true, "success"
 	end
-end
 
--- Gets the Event object by the event name provided.
--- @name Module:getEvent
--- @param String:eventName The name of the Event to get its object from.
--- @return `Event|nil` The Event object, if it exists.
-function Module:getEvent(eventName)
-	return self.eventList[eventName]
-end
-
--- Tells if an Event has been defined on the module.
--- @name Module:hasEvent
--- @param String:eventName The name of the Event to assert.
--- @return `Boolean` Whether the Event exists or not.
-function Module:hasEvent(eventName)
-	return not not self:getEvent(eventName)
-end
-
---- Creates a callback to trigger when an Event is emmited.
--- In case the Event exists, it will append the callback to the
--- internal list of the Event, so every callback will be executed
--- on the order it is defined. Otherwise it doesn't exist, an
--- Event object will be created, and the Event will be defined on
--- the Global Space.
--- @name Module:on
--- @param String:eventName The name of the Event.
--- @param Function:callback The callback to trigger.
--- @return `Boolean` Whether a new Event object was created or not.
--- @return `Number` The position of the callback in the calls list.
-function Module:on(eventName, callback)
-	local createdNewObject, position
-	local eventFullName = ("event%s"):format(eventName)
-
-	if not self:hasEvent(eventName) then
-		createdNewObject = self:addEvent(eventName)
-		
-		rawset(_G, eventFullName, function(...)
-			self:trigger(eventName, ...)
-		end)
+	-- Gets the Event object by the event name provided.
+	-- @name Module:getEvent
+	-- @param String:eventName The name of the Event to get its object from.
+	-- @return `Event|nil` The Event object, if it exists.
+	function Module:getEvent(eventName)
+		return self.eventList[eventName]
 	end
-	
-	position = self:getEvent(eventName):append(callback)
-	
-	return createdNewObject, position
-end
 
---- Adds an Event listener.
--- It will create the Event object required, with the event name
--- that has been provided.
--- @name Module:addEvent
--- @param String:eventName The name of the Event to create.
--- @return `Boolean` Whether or not a new Event object has been created.
-function Module:addEvent(eventName)
-	if not self:hasEvent(eventName) then
-		self.eventList[eventName] = Event:new(eventName)
-		
-		return true
+	-- Tells if an Event has been defined on the module.
+	-- @name Module:hasEvent
+	-- @param String:eventName The name of the Event to assert.
+	-- @return `Boolean` Whether the Event exists or not.
+	function Module:hasEvent(eventName)
+		return not not self:getEvent(eventName)
 	end
-	
-	return false
-end
 
-do
-	local critical = {
-		-- API
-		["FileLoaded"] = true,
-		["Loop"] = true,
-		["NewGame"] = true,
-		["NewPlayer"] = true,
-		["PlayerLeft"] = true,
-		["PlayerDataLoaded"] = true,
+	--- Creates a callback to trigger when an Event is emmited.
+	-- In case the Event exists, it will append the callback to the
+	-- internal list of the Event, so every callback will be executed
+	-- on the order it is defined. Otherwise it doesn't exist, an
+	-- Event object will be created, and the Event will be defined on
+	-- the Global Space.
+	-- @name Module:on
+	-- @param String:eventName The name of the Event.
+	-- @param Function:callback The callback to trigger.
+	-- @return `Boolean` Whether a new Event object was created or not.
+	-- @return `Number` The position of the callback in the calls list.
+	function Module:on(eventName, callback)
+		local createdNewObject, position
+		local eventFullName = ("event%s"):format(eventName)
+
+		if not self:hasEvent(eventName) then
+			createdNewObject = self:addEvent(eventName)
+			
+			if nativeEvents[eventName] then
+				rawset(_G, eventFullName, function(...)
+					if not self.isPaused then
+						self:trigger(eventName, ...)
+					end
+				end)
+			else
+				rawset(_G, eventFullName, function(...)
+					self:trigger(eventName, ...)
+				end)
+			end
+		end
 		
-		-- Module
-		["Pause"] = true,
-		["Resume"] = true,
- 	}
+		position = self:getEvent(eventName):append(callback)
+		
+		return createdNewObject, position
+	end
+
+	--- Adds an Event listener.
+	-- It will create the Event object required, with the event name
+	-- that has been provided.
+	-- @name Module:addEvent
+	-- @param String:eventName The name of the Event to create.
+	-- @return `Boolean` Whether or not a new Event object has been created.
+	function Module:addEvent(eventName)
+		if not self:hasEvent(eventName) then
+			self.eventList[eventName] = Event:new(eventName)
+			
+			return true
+		end
+		
+		return false
+	end
 	
 	--- Triggers the callbacks of an event emmited.
 	-- This function should not be called other than inside a true event
@@ -313,37 +323,32 @@ do
 			return ok
 		end
 	end
-end
 
---- Increases the runtime counter of the Module.
--- It will also check if the runtime reaches the limit established for the
--- module, and trigger a `Module Pause` in such case.
--- @name Module:increaseRuntime
--- @param Int:increment The amount of milliseconds to increment into the counter.
--- @return `Boolean` Whether the increment in runtime has caused the Module to pause.
-function Module:increaseRuntime(increment)
-	self.currentRuntime = self.currentRuntime + increment
-	
-	if self.currentRuntime >= self.runtimeLimit then
-		self:pause()
+	--- Increases the runtime counter of the Module.
+	-- It will also check if the runtime reaches the limit established for the
+	-- module, and trigger a `Module Pause` in such case.
+	-- @name Module:increaseRuntime
+	-- @param Int:increment The amount of milliseconds to increment into the counter.
+	-- @return `Boolean` Whether the increment in runtime has caused the Module to pause.
+	function Module:increaseRuntime(increment)
+		self.currentRuntime = self.currentRuntime + increment
 		
-		return true
+		if self.currentRuntime >= self.runtimeLimit then
+			self:pause()
+			
+			return true
+		end
+		
+		return false
 	end
-	
-	return false
-end
 
---- Triggers a Module Pause.
--- When it triggers, no events will be listened, and all objects will freeze.
--- This function is automatically called by a runtime check when an event
--- triggers, however, it `should` be safe to call it dinamically.
--- After pausing, the Module will automatically ressume on the next cycle.
--- @name Module:pause
--- @return `Number` The time it will take to ressume the Module, in milliseconds.
-do
-	local max = math.max
-	local newTimer = system.newTimer
-	local time = os.time
+	--- Triggers a Module Pause.
+	-- When it triggers, no events will be listened, and all objects will freeze.
+	-- This function is automatically called by a runtime check when an event
+	-- triggers, however, it `should` be safe to call it dinamically.
+	-- After pausing, the Module will automatically ressume on the next cycle.
+	-- @name Module:pause
+	-- @return `Number` The time it will take to ressume the Module, in milliseconds.
 	function Module:pause()
 		local time = max(500, ((self.currentCycle + 1.25) * self.cycleDuration) - time())
 		
@@ -357,103 +362,100 @@ do
 
 		return time
 	end
-end
---- Continues the Module execution.
--- All events ressume listening, as well as players take back their movility.
--- It will check if the Module is already paused, so it is safe to call it
--- without previous checks.
--- @name Module:continue
--- @return `Boolean` Whether the Module has been resumed or not.
-function Module:continue()
-	if self.isPaused then
-		self.isPaused = false
-		
-		self:setCycle()
-		
-		self:trigger("Resume")
-		
-		return true
-	end
 
-	return false
-end
-
---- Sets the appropiate Cycle of runtime checking.
--- Whenever a new cycle occurs, the runtime counter will reset,
--- and its fingerprint will log.
--- @name Module:setCycle
--- @return `Number` The current cycle.
-function Module:setCycle()
-	local lastCycle = self.currentCycle
-	
-	self.currentCycle = math.ceil(currentTime() / self.cycleDuration)
-	
-	if self.currentCycle ~= lastCycle then
-		self.runtimeLog[lastCycle] = self.currentRuntime
-		
-		self.currentRuntime = 0
-	end
-	
-	return self.currentCycle
-end
-
-function Module:setPercentageCounter()
-	
-end
-
-function Module:updatePercentage(increment)
-
-end
-
-function Module:getDebugInfo(asText)
-	
-end
-
---- Seeks for the player with the lowest latency to make them the sync, or establishes the selected one.
--- @name Module:setSync
--- @param String:playerName The Player to set as sync, if not provided then it will be picked automatically
--- @return `String` The new sync.
-function Module:setSync(playerName) -- Seeks for the player with the lowest latency for syncing.
-	if playerName then
-		if not Room:hasPlayer(playerName) then
-			playerName = nil
+	--- Continues the Module execution.
+	-- All events ressume listening, as well as players take back their movility.
+	-- It will check if the Module is already paused, so it is safe to call it
+	-- without previous checks.
+	-- @name Module:continue
+	-- @return `Boolean` Whether the Module has been resumed or not.
+	function Module:continue()
+		if self.isPaused then
+			self.isPaused = false
+			
+			self:setCycle()
+			
+			self:trigger("Resume")
+			
+			return true
 		end
+
+		return false
 	end
-	
-	if not playerName then
-		local candidate, bestLatency = "", math.huge
+
+	--- Sets the appropiate Cycle of runtime checking.
+	-- Whenever a new cycle occurs, the runtime counter will reset,
+	-- and its fingerprint will log.
+	-- @name Module:setCycle
+	-- @return `Number` The current cycle.
+	function Module:setCycle()
+		local lastCycle = self.currentCycle
 		
-		for playerName, player in next, tfm.get.room.playerList do
-			if player.averageLatency <= bestLatency then
-				bestLatency = player.averageLatency
-				candidate = playerName
+		self.currentCycle = math.ceil(currentTime() / self.cycleDuration)
+		
+		if self.currentCycle ~= lastCycle then
+			self.runtimeLog[lastCycle] = self.currentRuntime
+			
+			self.currentRuntime = 0
+		end
+		
+		return self.currentCycle
+	end
+
+	function Module:setPercentageCounter()
+		
+	end
+
+	function Module:updatePercentage(increment)
+
+	end
+
+	function Module:getDebugInfo(asText)
+		
+	end
+
+	--- Seeks for the player with the lowest latency to make them the sync, or establishes the selected one.
+	-- @name Module:setSync
+	-- @param String:playerName The Player to set as sync, if not provided then it will be picked automatically
+	-- @return `String` The new sync.
+	function Module:setSync(playerName) -- Seeks for the player with the lowest latency for syncing.
+		if playerName then
+			if not Room:hasPlayer(playerName) then
+				playerName = nil
 			end
 		end
 		
-		playerName = candidate
+		if not playerName then
+			local candidate, bestLatency = "", math.huge
+			
+			for playerName, player in next, tfm.get.room.playerList do
+				if player.averageLatency <= bestLatency then
+					bestLatency = player.averageLatency
+					candidate = playerName
+				end
+			end
+			
+			playerName = candidate
+		end
+		
+		tfm.exec.setPlayerSync(playerName)
+		
+		return playerName
+	end
+
+	function Module:newMode(modeName, constructor)
+		self.modeList[modeName] = Mode:new(modeName, constructor)
+	end
+
+	function Module:getMode(modeName)
+		modeName = modeName or self.subMode or ""
+		return self.modeList[modeName] or self.modeList[modeName:lower()]
+	end
+
+	function Module:hasMode(modeName)
+		return not not self:getMode(modeName or "")
 	end
 	
-	tfm.exec.setPlayerSync(playerName)
-	
-	return playerName
-end
-
-function Module:newMode(modeName, constructor)
-	self.modeList[modeName] = Mode:new(modeName, constructor)
-end
-
-function Module:getMode(modeName)
-	modeName = modeName or self.subMode or ""
-	return self.modeList[modeName] or self.modeList[modeName:lower()]
-end
-
-function Module:hasMode(modeName)
-	return not not self:getMode(modeName or "")
-end
-
-do
-	local rawget = rawget
-	local rawset = rawset
 	function Module:setMode(modeName)
 		local mode = self:getMode(modeName) or self:getMode("default")
 		

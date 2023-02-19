@@ -179,7 +179,7 @@ do
 			local p1 = tb + 1
 			for k, v in next, value do
 				kk = table.tostring(k, p1)
-				if not seen[v] then
+				if not seen[v] and not tostring(k):match("__index") then
 					if type(v) == "table" then
 						seen[v] = true
 						vv = table.tostring(v, p1, seen)

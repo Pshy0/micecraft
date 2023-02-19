@@ -86,12 +86,13 @@ function World:initChunks()
 				1
 			)
 			
-			self.chunks[y][x]:getCollisions("rectangle_detailed")
+			self.chunks[y][x]:getCollisions(self.physicsMode)
 		end
 	end
 end
 
-function World:init()	
+function World:init()
+	self:setPhysicsMode()
 	local mode = Module:getMode()
 	
 	self:generateNewMapData()

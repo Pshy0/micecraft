@@ -132,7 +132,6 @@ do
 	-- @name Block:removeAllDisplays
 	function Block:removeAllDisplays()
 		self.displayList = {}
-		self:initDisplay()
 	end
 end
 
@@ -163,7 +162,10 @@ do
 	-- @name Block:refreshDisplay
 	-- @return `Boolean` Whether it refreshed successfully or not
 	function Block:refreshDisplay()
-		return self:hide() and self:display()
+		local hidden = self:hide()
+		local displayed = self:display()
+		
+		return hidden and displayed
 	end
 	
 	local addImage = tfm.exec.addImage
@@ -204,12 +206,12 @@ end
 -- 1. The main object sprite according to its type.
 -- 2. The shadow sprite, in case it's in background layer.
 -- @name Block:setDefaultDisplay
-function Block:setDefaultDisplay()
+function Block:setDefaultDisplay(show)
 	if self.type ~= 0 then
-		self:addDisplay("main", 1, self.sprite, nil, self.dx, self.dy, REFERENCE_SCALE_X, REFERENCE_SCALE_Y, 0, 1.0)
+		self:addDisplay("main", 1, self.sprite, nil, self.dx, self.dy, REFERENCE_SCALE_X, REFERENCE_SCALE_Y, 0, 1.0, show)
 		
 		if not self.foreground then
-			self:addDisplay("shadow", 3, self.shadow, nil, self.dx, self.dy, REFERENCE_SCALE_X, REFERENCE_SCALE_Y, 0, 0.33)
+			self:addDisplay("shadow", 3, self.shadow, nil, self.dx, self.dy, REFERENCE_SCALE_X, REFERENCE_SCALE_Y, 0, 0.33, show)
 		end
 	end
 end

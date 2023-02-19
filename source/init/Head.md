@@ -150,7 +150,7 @@ Sets the appropiate Cycle of runtime checking. Whenever a new cycle occurs, the 
 ---
 
 ### **Module:setSync** ( `playerName`: string )
-Seeks for the player with the lowest latency to make them the sync, or establishes the selected one. Seeks for the player with the lowest latency for syncing.
+Seeks for the player with the lowest latency to make them the sync, or establishes the selected one. 
 
 
 **Parameters:**

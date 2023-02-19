@@ -97,7 +97,8 @@ local fileList = {
 		"NewGame",
 		"NewPlayer",
 		"PlayerDataLoaded",
-		"PlayerLeft"
+		"PlayerLeft",
+		"Mouse"
 	},
 	[12] = {
 		__name = "Launch",

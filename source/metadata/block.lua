@@ -63,23 +63,25 @@ blockMetadata:newTemplate("Dirt", {
 	
 	interactable = false,
 	color = 0x866042,
-	onUpdate = function(self, block)
-		if block.y < self.y then
-			if block.type ~= 0 then
-				if not (self.foreground and not block.foreground) then
-					if not block.translucent then
-						return false
+	onUpdate = function(self, block) -- Make grass
+		if self.x == block.x and block.y < self.y then -- If the block is right above us
+			if block.type ~= 0 then -- If it isn't air
+				if not (self.foreground and not block.foreground) then -- If its layer isn't lower than ours
+					if not block.translucent then -- If it isn't translucent
+						return false -- Do nothing
 					end
 				end
 			end
+			
+			local grassifyTime = math.random(6, 16)
+			self.eventTimer = Tick:newTask(grassifyTime, false, function()
+				self:create(2, self.foreground, true, true, false) -- Create a grass block
+			end)
+	
+			return true
 		end
 		
-		local grassifyTime = math.random(3000, 8000)
-		self.eventTimer = Timer.new(grassifyTime, false, function()
-			self:create(2, self.foreground, true, true, false) -- Create a grass block
-		end)
-	
-		return true
+		return false
 	end
 })
 
@@ -93,13 +95,13 @@ blockMetadata:newTemplate("Grass", "Dirt", {
 	
 	color = 0x44AA44,
 	
-	onUpdate = function(self, block)
-		if block.y < self.y then
-			if block.type ~= 0 then
-				if not (self.foreground and not block.foreground) then
-					if not block.translucent then
-						local dirtifyTime = math.random(3000, 8000)
-						self.eventTimer = Timer.new(dirtifyTime, false, function()
+	onUpdate = function(self, block) -- Make it dirt
+		if block.x == self.x and block.y < self.y then -- If the block that updated is above this one
+			if block.type ~= 0 then -- If it isn't air
+				if not (self.foreground and not block.foreground) then -- If the block layer isn't lower than ours
+					if not block.translucent then -- If the block isn't translucent
+						local dirtifyTime = math.random(6, 16)
+						self.eventTimer = Tick:newTask(dirtifyTime, false, function()
 							self:create(1, self.foreground, true, true, false) -- Create a dirt block
 						end)
 					
@@ -143,9 +145,9 @@ blockMetadata:newTemplate("Ore", "Stone", {
 	end
 })
 
-blockMetadata:set(0, "Void", {category = 0})
-blockMetadata:set(1, "Dirt") -- dirt
-blockMetadata:set(2, "Grass") -- grass
+blockMetadata:set(0, "Void", {name="void", category = 0})
+blockMetadata:set(1, "Dirt", {name="dirt"}) -- dirt
+blockMetadata:set(2, "Grass", {name="grass"}) -- grass
 blockMetadata:set(3, "Grass", {name="snowed_grass", sprite="17dd4aedb5d.png"}) -- snowed grass
 blockMetadata:set(4, "Dirt", {name="dirtcelium", sprite="17dd4ae8f5b.png"}) -- dirtcelium
 blockMetadata:set(5, "Grass", {name="mycelium", sprite="17dd4b1875c.png"}) -- mycelium

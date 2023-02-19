@@ -21,7 +21,7 @@ do
 			ti(blocks, World:getBlock(self.x, self.y - 1, "matrix"))
 			ti(blocks, World:getBlock(self.x + 1, self.y, "matrix"))
 			ti(blocks, World:getBlock(self.x, self.y + 1, "matrix"))
-			ti(blocks, self)
+			if include then ti(blocks, self) end
 		elseif shape == "square" then
 			for y = -1, 1 do
 				for x = -1, 1 do
@@ -44,9 +44,10 @@ end
 function Block:updateEvent(update, updatePhysics)
 	do
 		local blocks = self:getBlocksAround("cross", false)
-		local segmentList = {}
+		local segmentList = {
+			[self.segmentId] = true
+		}
 		if update ~= false then
-			
 			for position, block in next, blocks do
 				segmentList[block.segmentId] = true
 				block:onUpdate(self)
@@ -54,7 +55,14 @@ function Block:updateEvent(update, updatePhysics)
 		end
 		
 		if updatePhysics ~= false then
-			self:getChunk():refreshSegmentList(segmentList)
+			self:getChunk():refreshPhysics(World.physicsMode, segmentList, true, {
+					xStart=self.x, 
+					xEnd = self.x, 
+					yStart=self.y, 
+					yEnd=self.y, 
+					category=self.category
+				}
+			)
 		end
 	end
 end

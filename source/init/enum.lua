@@ -58,12 +58,11 @@ enum.physics = {
 }
 -- Generación de terreno:
 -- Generar mapas para temperatura y Humedad
--- Generar Altitud en base a temperaturas y humedad
--- Suavizar Altitud
+-- Generar Altitud
 -- Generar mapa para rareza
 -- Calcular bioma
--- Añadir octavas según el bioma
--- Suavizar altitud nuevamente (5 bloques de margen a cada lado del borde entre chunks)
+-- Añadir octavas al terrenosegún el bioma
+-- Suavizar altitud nuevamente (3 bloques de margen a cada lado del borde entre chunks)
 -- Añadir elementos característicos por bioma
 enum.biome = { -- T: Temperatura (-1 - 2)	H: Humedad (0 - 2)		R: Rareza (0 _1_ 2 3)
 	-- Temperatura:

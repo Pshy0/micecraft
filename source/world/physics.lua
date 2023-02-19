@@ -1,16 +1,9 @@
 do
-	local default_cats = {1, 2, 3, 4, 6}
+	local default_cats = {[1]=true, [2]=true, [3]=true, [4]=true, [6]=true}
 	local abs = math.abs
 	local ipairs = ipairs
 	local next = next
-	local tk = function(t)
-		local nt = {}
-		for k, v in ipairs(t) do
-			nt[v] = true
-		end
-		
-		return nt
-	end
+	
 	function World.physicsMap:getSegment(xs, ys, xe, ye, cat)
 		return {
 			xStart = xs,
@@ -117,7 +110,7 @@ do
 		local list = {}
 		local block 
 		
-		for _, cat in next, catlist do -- There should be a better way to do this. At the moment I wrote it I couldn't think of one.
+		for cat, _ in next, catlist do -- There should be a better way to do this. At the moment I wrote it I couldn't think of one.
 			repeat
 				matches = 0
 				xe = xEnd
@@ -176,25 +169,30 @@ do
 	end
 	
 	function World.physicsMap:line(xStart, xEnd, yStart, yEnd)
-		local list
+		local list = {}
 		
 		local match = false
 		local ys, ye
+		local ct 
 		
 		for x = xStart, xEnd do
 			match = false
 			ys = yStart
 			ye = yEnd
 			for y = yStart, yEnd do
-				if self[y][x] > 0 then
+				ct = self[y][x]
+				if ct > 0 then
 					if match then
 						ye = y
 					else
 						ys = y
+						ye = y
 						match = true
 					end
-					self[y][x] = -self[y][x]
-				else
+					self[y][x] = -ct
+				end
+				
+				if ct <= 0 or y == yEnd then
 					if match then
 						q(list, self:getSegment(x, ys, x, ye, 1))
 						match = false
@@ -207,33 +205,43 @@ do
 	end
 	
 	function World.physicsMap:line_detailed(xStart, xEnd, yStart, yEnd, catlist)
-		local list
+		local list = {}
 		catlist = catlist or default_cats
-		local cl = tk(catlist)
 		
 		local match = false
 		local ys, ye
-		local picked
+		local ct
+		local y
 		
 		for x = xStart, xEnd do
 			match = false
 			ys = yStart
 			ye = yEnd
-			for y = yStart, yEnd do
-				if cl[self[y][x]] and (self[y][x] == match or not match) then
+			y = yStart
+			while y <= yEnd do
+				ct = self[y][x]
+				if catlist[ct] and (ct == match or not match) then
 					if match then
 						ye = y
 					else
 						ys = y
-						
-						match = self[y][x]
+						ye = y
+						match = ct
 					end
-					self[y][x] = -self[y][x]
-				else
+					self[y][x] = -ct
+				end
+				
+				if (ct <= 0 or ct ~= match) or y == yEnd then
 					if match then
 						q(list, self:getSegment(x, ys, x, ye, match))
 						match = false
 					end
+					
+					if match ~= ct then
+						y = y + 1
+					end
+				else
+					y = y + 1
 				end
 			end
 		end
@@ -242,26 +250,30 @@ do
 	end
 	
 	function World.physicsMap:row(xStart, xEnd, yStart, yEnd)
-		local list
+		local list = {}
 		
 		local match = false
 		local xs, xe
-		
+		local ct
 		for y = yStart, yEnd do
 			match = false
 			xs = xStart
 			xe = xEnd
 			
 			for x = xStart, xEnd do
-				if self[y][x] > 0 then
+				ct = self[y][x]
+				if ct > 0 then
 					if match then
 						xe = x
 					else
 						xs = x
+						xe = x
 						match = true
 					end
-					self[y][x] = -self[y][x]
-				else
+					self[y][x] = -ct
+				end
+				
+				if ct <= 0 or x == xEnd then
 					if match then
 						q(list, self:getSegment(xs, y, xe, y, 1))
 						match = false
@@ -274,32 +286,42 @@ do
 	end
 	
 		function World.physicsMap:row_detailed(xStart, xEnd, yStart, yEnd, catlist)
-		local list
-		catlist = catlist or default_cats
-		local cl = tk(catlist)
+		local list = {}
 		
 		local match = false
 		local xs, xe
+		local ct
+		local x
 		
 		for y = yStart, yEnd do
 			match = false
 			xs = xStart
 			xe = xEnd
 			
-			for x = xStart, xEnd do
-				if self[y][x] > 0 then
-					if match and (self[y][x] == match or not match) then
+			x = xStart
+			while x <= xEnd do
+				ct = self[y][x]
+				if catlist[ct] and (ct == match or not match) then
+					if match then
 						xe = x
 					else
 						xs = x
-						match = self[y][x]
+						xe = x
+						match = ct
 					end
-					self[y][x] = -self[y][x]
-				else
+					
+					self[y][x] = -ct
+				end
+				
+				if (ct <= 0 or ct ~= match) or x == xEnd then
 					if match then
 						q(list, self:getSegment(xs, y, xe, y, match))
 						match = false
+					else
+						x = x + 1
 					end
+				else
+					x = x + 1
 				end
 			end
 		end

@@ -17,9 +17,10 @@ function Block:new(uniqueId, type, foreground, worldX, worldY, displayX, display
 	local this = setmetatable({ -- Define this way to save some table acceses.
 		uniqueId = uniqueId,
 		chunkId = 0,
+		segmentId = -1,
 		
 		type = type,
-		category = meta.category,
+		category = foreground and meta.category or 0,
 		
 		timestamp = 0,
 		eventTimer = -1,
@@ -85,7 +86,7 @@ function Block:new(uniqueId, type, foreground, worldX, worldY, displayX, display
 	
 	this:setDefaultDisplay()
 	
-	return this, meta.category
+	return this, this.category
 end
 
 do
@@ -111,8 +112,8 @@ do
 		self.hardness = 0
 		
 		self.timestamp = 0
-		Timer.remove(self.eventTimer)
-		self.eventTimer = nil
+		Tick:removeTask(self.eventTimer)
+		self.eventTimer = -1
 		
 		self.onCreate = void
 		self.onPlacement = void
