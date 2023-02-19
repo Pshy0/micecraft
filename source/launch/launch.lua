@@ -8,7 +8,7 @@ function Module:start()
 	
 	mode:run()
 	
-	local width, height = World:getPixelDimensions()
+	local width, height = World:getMapPixelDimensions()
 	tfm.exec.newGame(xmlLoad:format(width, height, width/2, height/2))
 end
 

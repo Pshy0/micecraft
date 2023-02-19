@@ -179,7 +179,16 @@ tfm = {
         lowerSyncDelay = emptyFunc,
         moveObject = emptyFunc,
         movePlayer = emptyFunc,
-        newGame = emptyFunc,
+        newGame = function()
+            if eventNewGame then
+                eventNewGame()
+                if eventLoop then
+                    for i=1, 20 do
+                        eventLoop()
+                    end
+                end
+            end
+        end,
         playEmote = emptyFunc,
         playerVictory = emptyFunc,
         removeBonus = emptyFunc,

@@ -54,6 +54,10 @@ function World:getPixelDimensions()
 	return self.pixelWidth, self.pixelHeight
 end
 
+function World:getMapPixelDimensions()
+	return self.rightEdge, self.lowerEdge
+end
+
 function World:getBlocks()
 	return self.chunkRows * self.chunkWidth, self.chunkLines * self.chunkHeight
 end

@@ -373,3 +373,209 @@ Encodes a table into a reasonable format.
 
 **Returns:**
 - `String` The encoded table
+
+---
+
+### **Timer:new** ( `awaitTime`: int, `loop`: boolean, `callback`: function, `...`: any )
+Creates a new Timer. Timers can wait an established amount of seconds before triggering a callback.
+
+
+**Parameters:**
+- **awaitTime** (`Int`) : The time that the Timer should wait before executing, in milliseconds
+- **loop** (`Boolean`) : Whether the timer should trigger repeatedly or once
+- **callback** (`Function`) : The function to call when the Timer triggers
+- **...** (`Any`) : Extra arguments for callback
+
+
+**Returns:**
+- `Int` The internal identifier of the Timer
+
+---
+
+### **Timer:get** ( `timerId`: int )
+Retrieves a Timer object. 
+
+
+**Parameters:**
+- **timerId** (`Int`) : The identifier of the Timer.
+
+
+**Returns:**
+- `Timer` The timer object
+
+---
+
+### **Timer:remove** ( `timerId`: int )
+Removes a Timer from the stack. 
+
+
+**Parameters:**
+- **timerId** (`Int`) : The identifier of the Timer.
+
+---
+
+### **Timer:handle** (  )
+Handles the execution of all Timers present on the stack. The timers are called in protected mode, so if an error happens, the timer will be killed and the error wont be propagated.
+
+
+**Returns:**
+- `Int` The amount of timers executed in this cycle.
+- `Int` The amount of timers that had an error in this cycle.
+
+---
+
+### **Tick:step** ( `amount`: int )
+Steps the specified amount of Ticks. If the amount is just 1, then the Timer will just increase. Otherwise, it will execute all the tasks for the next ticks.
+
+
+**Parameters:**
+- **amount** (`Int`) : The amount of steps to make.
+
+---
+
+### **Task:new** ( `awaitTicks`: int, `shouldLoop`: boolean, `callback`: function, `...`: any )
+Creates a new Task object. Tasks are used as an abstraction layer for executing events with a delay on a controlated environment.
+
+
+**Parameters:**
+- **awaitTicks** (`Int`) : The ticks that the task should await before executing
+- **shouldLoop** (`Boolean`) : Whether the specified task should be executed repeatedly or only once
+- **callback** (`Function`) : The task to execute
+- **...** (`Any`) : Extra arguments for task
+
+
+**Returns:**
+- `Task` A Task object.
+
+---
+
+### **Task:renew** (  )
+Renews a Task execution time. The new time will be the current tick, plus the assigned ticks of delay.
+
+
+**Returns:**
+- `Int` The new tick were the Task will be executed
+
+---
+
+### **Task:kill** ( `reason`: string )
+Destroys a Task object. 
+
+
+**Parameters:**
+- **reason** (`String`) : The reason for the call. Used internally only when an error happens
+
+---
+
+### **Task:execute** (  )
+Executes the callback of the Task. 
+
+
+**Returns:**
+- `Boolean` Whether the task has been renewed or not
+
+---
+
+### **Tick.slice:new** ( `tick`: int )
+Creates a new Slice. Slices consist of lookup tables with identifiers of the Task that need to be executed at an exact tick. A slice is, thus, the list of tasks for a specific tick.
+
+
+**Parameters:**
+- **tick** (`Int`) : The tick for which this slice belongs to
+
+---
+
+### **Tick.slice:addTask** ( `tick`: int, `taskId`: int )
+Adds a Task to a Slice's stack. 
+
+
+**Parameters:**
+- **tick** (`Int`) : The identifier of the slice
+- **taskId** (`Int`) : The identifier of the Task
+
+
+**Returns:**
+- `Int` The internal position of the task in the Slice's stack.
+
+---
+
+### **Tick.slice:get** ( `tick`: int )
+Retrieves a Slice object. 
+
+
+**Parameters:**
+- **tick** (`Int`) : The identifier of the slice
+
+
+**Returns:**
+- `Slice` A Slice object, if it exists.
+
+---
+
+### **Tick.slice:remove** ( `tick`: int )
+Deletes a Slice object. 
+
+
+**Parameters:**
+- **tick** (`Int`) : The identifier of the slice
+
+---
+
+### **Tick:newTask** ( `awaitTicks`: int, `shouldLoop`: boolean, `callback`: function, `...`: any )
+Adds a New Task to the stack. 
+
+
+**Parameters:**
+- **awaitTicks** (`Int`) : The ticks that the task should await before executing
+- **shouldLoop** (`Boolean`) : Whether the specified task should be executed repeatedly or only once
+- **callback** (`Function`) : The task to execute
+- **...** (`Any`) : Extra arguments for task
+
+
+**Returns:**
+- `Int` The identifier of the Task.
+
+---
+
+### **Tick:getTask** ( `taskId`: int )
+Retrieves a Task object. 
+
+
+**Parameters:**
+- **taskId** (`Int`) : The identifier of the Task object
+
+
+**Returns:**
+- `Task` The task Object, if it exists.
+
+---
+
+### **Tick:removeTask** ( `taskId`: int )
+Removes a Task from the stack. 
+
+
+**Parameters:**
+- **taskId** (`Int`) : The identifier of the Task
+
+---
+
+### **Tick:setTaskTime** ( `taskId`: int, `tick`: int )
+Sets a new time for the specified Task. 
+
+
+**Parameters:**
+- **taskId** (`Int`) : The identifier of the Task
+- **tick** (`Int`) : The tick were that task should execute
+
+
+**Returns:**
+- `Boolean` Whether the time was successfully set or not
+
+---
+
+### **Tick:handle** (  )
+Handles the execution of all Tasks scheduled for a tick. A tick doesn't end unless all tasks have been executed.
+
+
+**Returns:**
+- `Boolean` Whether the tick has stepped one (1) unit or not.

@@ -1,7 +1,12 @@
-Module:on("Loop", function(elapsed, remaining)
-	ticks = ticks + 1
-	
-	if (ticks % 40) == 0 then
-		Module:setSync()
-	end
+Module:on("Loop", function(elapsedTime, remainingTime)
+	-- Update players
 end)
+
+Module:on("Loop", function(elapsedTime, remainingTime)
+	Tick:handle()
+end)
+
+Module:on("Loop", function(elapsedTime, remainingTime)
+	Timer:handle()
+end)
+

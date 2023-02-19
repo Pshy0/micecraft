@@ -117,7 +117,7 @@ do
 		local list = {}
 		local block 
 		
-		for _, cat in catlist do -- There should be a better way to do this. At the moment I wrote it I couldn't think of one.
+		for _, cat in next, catlist do -- There should be a better way to do this. At the moment I wrote it I couldn't think of one.
 			repeat
 				matches = 0
 				xe = xEnd
@@ -130,7 +130,7 @@ do
 				while x <= xe do
 					y = ys or yStart
 					while y <= ye do
-						if self[y][x] == cat then -- Not processed
+						if cat > 0 and self[y][x] == cat then -- Not processed
 							if ys then
 								if y == yEnd and x == xStart then
 									ye = y
@@ -143,6 +143,7 @@ do
 							matches = matches + 1
 							self[y][x] = -self[y][x]
 						else -- Processed
+							
 							if ys then
 								if x == xs then
 									ye = y - 1
@@ -158,6 +159,7 @@ do
 								end
 							end
 						end
+						
 						y = y + 1
 					end
 					x = x + 1
@@ -167,7 +169,7 @@ do
 					q(list, self:getSegment(xs, ys, xe, ye, cat))
 				end
 				
-			until (matches == 0)
+			until (matches <= 0)
 		end
 		
 		return list

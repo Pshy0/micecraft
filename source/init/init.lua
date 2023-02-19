@@ -37,8 +37,8 @@ do
 		end
 	})
 end
---		ALT:	'<C><P Ca="" H="%d" L="%d" /><Z><S></S><D><T X="%d" Y="%d" D="" /></D><O /></Z></C>'
-local xmlLoad = '<C><P Ca="" H="%d" L="%d" /><Z><S></S><D><DS X="%d" Y="%d" /></D><O /></Z></C>'
+--		ALT:	'<C><P Ca="" L="%d" H="%d" /><Z><S></S><D><T X="%d" Y="%d" D="" /></D><O /></Z></C>'
+local xmlLoad = '<C><P Ca="" L="%d" H="%d"  /><Z><S></S><D><DS X="%d" Y="%d" /></D><O /></Z></C>'
 
 local Module = {}
 
@@ -62,7 +62,8 @@ Chunk.__index = Chunk
 local World = {
 	physicsMap = {},
 	blocks = {},
-	chunks = {}
+	chunks = {},
+	pre = {}
 }
 
 local MetaData = {}
@@ -72,7 +73,20 @@ local blockMetadata = {}
 local Player = {}
 Player.__index = Player
 
-local ticks = 0
+local Timer = {
+	uniqueId = -1,
+	list = {},
+	counter = 0
+}
+
+Timer.__index = Timer
+local Tick = {
+	current = 0,
+	tps = 0,
+	slice = {},
+	taskList = {}
+}
+Tick.__index = Tick
 
 local BOX2D_MAX_SIZE = 32767 -- Constant according to game limitations. Do not modify!
 local TEXTURE_SIZE = 32 -- Constant according to assets uploaded. Do not modify !

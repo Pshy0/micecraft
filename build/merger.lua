@@ -17,13 +17,14 @@ local fileList = {
 		__docs = true,
 		"math",
 		"table",
-		"data"
+		"data",
+		"timer",
+		"tick"
 	},
 	[3] = {
 		__name = "Head",
 		__directory = "source/init",
 		__docs = true,
-		"init",
 		"module",
 		"room",
 		"env",
@@ -92,6 +93,7 @@ local fileList = {
 		__name = "Events",
 		__directory = "source/events",
 		__docs = false,
+		"Loop",
 		"NewGame",
 		"NewPlayer",
 		"PlayerDataLoaded",

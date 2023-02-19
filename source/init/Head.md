@@ -2,17 +2,6 @@
 
 ---
 
-### **_G.__newindex** ( `self`: table, `k`: any, `v`: any )
-Crashes on the slightlest sign of a global. We don't want globals in our code. They pollute the global environment, are prone to cause memory leaks on the Lua VM, make debugging harder, and increases unnecessarily the table acceses. Only Transformice events should be globals, because that's the only way callbacks can be received.
-
-
-**Parameters:**
-- **self** (`Table`) : Global space
-- **k** (`Any`) : Key
-- **v** (`Any`) : Value
-
----
-
 ### **Module:init** ( `apiVersion`: unknown, `tfmVersion`: unknown )
 Initializes the Module. This function creates the table for the event list, the registers of runtime and may be used to verify various other things. It should only be called on pre-start, because it doesn't check if previous values already exist, and may delete all of them.
 

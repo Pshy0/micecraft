@@ -26,26 +26,24 @@ do
 	-- @name Block:display
 	-- @return `Boolean` Whether it displayed or not
 	local addImage = tfm.exec.addImage
+	local next = next
 	function Block:display()
 		if self.displayList then
 			local rlist = self.removalList
 			local rindex
 			for index, sprite in next, self.displayList do
-				if sprite.active then
-					rindex = #rlist + 1
-					
-					rlist[rindex] = addImage(
-						sprite[1], sprite[2],
-						sprite[3], sprite[4],
-						nil,
-						sprite[5], sprite[6],
-						sprite[7], sprite[8],
-						0, 0,
-						false
-					)
-					
-					sprite.removeIndex = rindex
-				end
+				rindex = #rlist + 1
+				
+				rlist[rindex] = addImage(
+					sprite[1], sprite[2],
+					sprite[3], sprite[4],
+					nil,
+					sprite[5], sprite[6],
+					sprite[7], sprite[8],
+					0, 0,
+					false
+				)
+				sprite.removeIndex = rindex
 			end
 			
 			return true
@@ -81,7 +79,7 @@ do
 		
 		self.displayList[order] = {
 			imageUrl or self.sprite,
-			targetLayer or (self.foreground and "!5" or "_100"),
+			targetLayer or (self.foreground and "!100" or "_100"),
 			displayX or self.dx,
 			displayY or self.dy,
 			scaleX or REFERENCE_SCALE_X,

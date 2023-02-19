@@ -1,10 +1,8 @@
-function World:preSetLayer(layer, heightMap)
-	local width, height = self:getBlocks()
+function World.pre:setLayer(layer, heightMap)
+	local width, height = World:getBlocks()
 	local dir = layer.dir
 	local overwrite = layer.overwrite
 	local isExclusive = layer.exclusive
-	
-	local pre = self.pre
 	
 	local ys = math.max(dir.min or 1, 1) -- Y Start
 	local ye = math.min(dir.max or height, height) -- Y End
@@ -25,8 +23,8 @@ function World:preSetLayer(layer, heightMap)
 				break
 			end
 			
-			if overwrite or pre[y][x].type == 0 then
-				pre:assignTemplate(x, y, template)
+			if overwrite or self[y][x].type == 0 then
+				self:assignTemplate(x, y, template)
 			end
 			
 			depth = depth + 1
@@ -34,14 +32,11 @@ function World:preSetLayer(layer, heightMap)
 	end
 end
 
-function World:preSetHeightMap(mapInfo)
+function World.pre:setHeightMap(mapInfo)
 	local dir = mapInfo.dir
 	local heightMap = mapInfo.heightMap
 	local loops = mapInfo.loops
-	
-	local pre = self.pre
-	
-	local width, height = self:getBlocks()
+	local width, height = World:getBlocks()
 	
 	local xs = mapInfo.xStart or 1 -- X Start
 	local xe = mapInfo.xEnd or math.min(xs + #heightMap, width) -- X End
@@ -78,20 +73,18 @@ function World:preSetHeightMap(mapInfo)
 				break
 			end
 			
-			pre:assignTemplate(x, y, template)
+			self:assignTemplate(x, y, template)
 		end
 	end
 end
 
 -- To Do: Add 2D Noise parser
 
-function World:preSetNoiseMap(mapInfo)
+function World.pre:setNoiseMap(mapInfo)
 	local noiseMap = mapInfo.noiseMap
 	local dir = mapInfo.dir
-	
-	local pre = self.pre
-	
-	local width, height = self:getBlocks()
+
+	local width, height = World:getBlocks()
 	
 	local xs = math.range(dir.xStart or 1, 1, width)
 	local xe = math.range(dir.xEnd or width, 1, width)
@@ -115,7 +108,7 @@ function World:preSetNoiseMap(mapInfo)
 				sqr = noiseMap[yo][xo] or 0
 				
 				if sqr > threshold then
-					pre:assignTemplate(x, y, dir)
+					self:assignTemplate(x, y, dir)
 				end
 			end
 		end

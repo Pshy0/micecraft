@@ -52,6 +52,7 @@ end
 blockMetadata:newTemplate("Dirt", {
 	name = "dirt",
 	
+	category = enum.category.grains,
 	drop = 1,
 	durability = 14,
 	hardness = 0,
@@ -115,6 +116,7 @@ blockMetadata:newTemplate("Grass", "Dirt", {
 blockMetadata:newTemplate("Stone", {
 	name = "stone",
 	
+	category = enum.category.rocks_n_metals,
 	drop = 0, -- To define
 	
 	glow = 0,
@@ -141,6 +143,7 @@ blockMetadata:newTemplate("Ore", "Stone", {
 	end
 })
 
+blockMetadata:set(0, "Void", {category = 0})
 blockMetadata:set(1, "Dirt") -- dirt
 blockMetadata:set(2, "Grass") -- grass
 blockMetadata:set(3, "Grass", {name="snowed_grass", sprite="17dd4aedb5d.png"}) -- snowed grass

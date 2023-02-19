@@ -11,7 +11,7 @@ do
 	function Segment:new(description, block, chunk)
 
 		local this = setmetatable({
-			id = block.chunkUniqueId,
+			uniqueId = block.chunkUniqueId,
 			presenceId = block.uniqueId,
 			chunkId = block.chunkId,
 			
@@ -84,6 +84,11 @@ do
 			miceCollision = catdef.collides,
 			groundCollision = catdef.collides,
 			contactListener = catdef.collides,
+			
+			foreground = true,
+			angle = 0,
+			
+			dynamic = false
 		}
 		
 		self.x = self.xtl + (w / 2)
@@ -94,9 +99,9 @@ do
 	local removePhysicObject = tfm.exec.removePhysicObject
 	function Segment:setState(active)
 		if active then
-			addPhysicObject(self.uniqueId, self.x, self.y, self.bodydef)
+			addPhysicObject(self.presenceId, self.x, self.y, self.bodydef)
 		else
-			removePhysicObject(self.uniqueId)
+			removePhysicObject(self.presenceId)
 		end
 		
 		self.state = active
@@ -166,7 +171,7 @@ do
 		mode = mode or "rectangle_detailed"
 		local method = World.physicsMap[mode]
 		
-		local seglist = method(World.physicsMap, xStart, xEnd, yStart, yEnd, cats)
+		local seglist = method(World.physicsMap, xStart or self.xf, xEnd or self.xb, yStart or self.yf, yEnd or self.yb, cats)
 		
 		for _, segment in ipairs(seglist) do
 			self:setSegment(segment)

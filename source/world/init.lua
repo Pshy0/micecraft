@@ -52,12 +52,14 @@ function World:initBlocks()
 		blocks[y] = {}
 		for x = 1, width do
 			blockId = blockId + 1
+			
 			temp = pre[y][x]
+			
 			blocks[y][x], pm[y][x] = Block:new(
 				blockId,
 				temp.type, temp.tangible,
 				x, y,
-				ox + (x * bw), oy + (y * bh),
+				ox + ((x-1) * bw), oy + ((y-1) * bh),
 				bw, bh
 			)
 		end
@@ -83,15 +85,13 @@ function World:initChunks()
 				xoff + ((x - 1) * xp), yoff + ((y-1) * yp),
 				1
 			)
+			
+			self.chunks[y][x]:getCollisions("rectangle_detailed")
 		end
 	end
 end
 
-function World:init()
-	self.pre = {}
-	self.blocks = {}
-	self.chunks = {}
-	
+function World:init()	
 	local mode = Module:getMode()
 	
 	self:generateNewMapData()
