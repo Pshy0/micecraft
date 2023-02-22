@@ -184,7 +184,7 @@ tfm = {
                 eventNewGame()
                 if eventLoop then
                     for i=1, 20 do
-                        eventLoop()
+                        eventLoop(500 * i, 120000 - (500 * i))
                     end
                 end
             end
@@ -203,6 +203,7 @@ tfm = {
         setGameTime = emptyFunc,
         setNameColor = emptyFunc,
         setNightMode = emptyFunc,
+        setPlayerGravityScale = emptyFunc,
         setPlayerSync = emptyFunc,
         setPlayerScore = emptyFunc,
         setRoomMaxPlayers = emptyFunc,

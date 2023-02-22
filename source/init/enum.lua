@@ -171,6 +171,14 @@ enum.biome = { -- T: Temperatura (-1 - 2)	H: Humedad (0 - 2)		R: Rareza (0 _1_ 2
 	end_highlands = 1012, -- T: 0.0, H: 1.0, R: 
 }
 
+enum.keys = {
+	[0] = "left",
+	[1] = "up",
+	[2] = "right",
+	[3] = "down",
+	[32] = "space",
+}
+
 do
 	local associate = function(t)
 		local it = {}

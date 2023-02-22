@@ -125,6 +125,20 @@ do
 		return array
 	end
 	
+	--- Counts all entries in a Table.
+	-- @name table.count
+	-- @param Table:t The table to count values on
+	-- @return `Int` The amount of entries
+	table.count = function(t)
+		local count = 0
+		
+		for k, v in next, t do
+			count = count + 1
+		end
+		
+		return count
+	end
+	
 	--- Copies all the keys from the table and assigns them the value given.
 	-- @name table.copykeys
 	-- @param Table:t The table to copy keys from

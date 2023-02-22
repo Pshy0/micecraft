@@ -1,4 +1,3 @@
-local VERSION = "0.1.0-alpha"
 local LOCAL_EPOCH = os.time()
 
 local bit32, coroutine, math, os, string, table = _G.bit32, _G.coroutine, _G.math, _G.os, _G.string, _G.table
@@ -40,7 +39,24 @@ end
 --		ALT:	'<C><P Ca="" L="%d" H="%d" /><Z><S></S><D><T X="%d" Y="%d" D="" /></D><O /></Z></C>'
 local xmlLoad = '<C><P Ca="" L="%d" H="%d"  /><Z><S></S><D><DS X="%d" Y="%d" /></D><O /></Z></C>'
 
-local Module = {}
+local Module = {
+	version = "0.1.1-alpha",
+	apiVersion = "",
+	tfmVersion = "",
+	
+	modeList = {},
+	
+	eventList = {},
+	currentCycle = 0,
+	cycleDuration = 0,
+	
+	runtimeLog = {},
+	currentTime = {},
+	runtimeLimit = {},
+	
+	isPaused = false,
+	args = {}
+}
 
 local Room = {
 	playerList = {},
@@ -59,10 +75,23 @@ Block.__index = Block
 local Chunk = {}
 Chunk.__index = Chunk
 
+local ChunkQueue = {
+	name = "Chunk Queue",
+	duplicates = false,
+	stack = {},
+	entries = {},
+	buffer = {}
+}
+ChunkQueue.__index = ChunkQueue
+
 local World = {
 	physicsMap = {},
 	blocks = {},
-	chunks = {}
+	chunks = {},
+	chunkLookup = {},
+	counter = {},
+	gravityForce = 0,
+	windForce = 0
 }
 
 local Field = {}
@@ -83,7 +112,10 @@ local Timer = {
 Timer.__index = Timer
 local Tick = {
 	current = 0,
+	halted = 0,
 	tps = 0,
+	lastTickTimestamp = os.time(),
+	lastTick = 0,
 	slice = {},
 	taskList = {}
 }

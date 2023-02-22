@@ -15,18 +15,25 @@ do
 		t[#t + 1] = v
 	end
 	function Block:getBlocksAround(shape, include)
+		local world = World
 		local blocks = {}
+		if include then ti(blocks, self) end
+		
 		if shape == "cross" then
-			ti(blocks, World:getBlock(self.x - 1, self.y, "matrix"))
-			ti(blocks, World:getBlock(self.x, self.y - 1, "matrix"))
-			ti(blocks, World:getBlock(self.x + 1, self.y, "matrix"))
-			ti(blocks, World:getBlock(self.x, self.y + 1, "matrix"))
-			if include then ti(blocks, self) end
+			ti(blocks, world:getBlock(self.x - 1, self.y, "matrix"))
+			ti(blocks, world:getBlock(self.x, self.y - 1, "matrix"))
+			ti(blocks, world:getBlock(self.x + 1, self.y, "matrix"))
+			ti(blocks, world:getBlock(self.x, self.y + 1, "matrix"))
+		elseif shape == "corner" then
+			ti(blocks, world:getBlock(self.x-1, self.y-1, "matrix"))
+			ti(blocks, world:getBlock(self.x+1, self.y-1, "matrix"))
+			ti(blocks, world:getBlock(self.x-1, self.y+1, "matrix"))
+			ti(blocks, world:getBlock(self.x+1, self.y+1, "matrix"))
 		elseif shape == "square" then
 			for y = -1, 1 do
 				for x = -1, 1 do
-					if not (x == 0 and y == 0) or include then
-						ti(blocks, World:getBlock(self.x + x, self.y + y, "matrix"))
+					if not (x == 0 and y == 0) then
+						ti(blocks, world:getBlock(self.x + x, self.y + y, "matrix"))
 					end
 				end
 			end
@@ -49,12 +56,21 @@ function Block:updateEvent(update, updatePhysics)
 		}
 		if update ~= false then
 			for position, block in next, blocks do
-				segmentList[block.segmentId] = true
+				if block.chunkId == self.chunkId then
+					segmentList[block.segmentId] = true
+				end
 				block:onUpdate(self)
 			end
 		end
 		
 		if updatePhysics ~= false then
+			local xBlocks = self:getBlocksAround("corner", false)
+			for position, block in next, xBlocks do
+				if block.chunkId == self.chunkId then
+					segmentList[block.segmentId] = true
+				end
+			end
+			
 			self:getChunk():refreshPhysics(World.physicsMode, segmentList, true, {
 					xStart=self.x, 
 					xEnd = self.x, 

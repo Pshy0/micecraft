@@ -27,6 +27,10 @@ do
 		if ctype == "matrix" then
 			fx = x
 			fy = y
+		elseif y  == "uniqueId" then
+			local info = self.chunkLookup[x]
+			fx = info.x
+			fy = info.y
 		elseif ctype == "map" then
 			local ox, oy = self:getEdges()
 			local cx, cy = self:getChunkPixelDimensions()

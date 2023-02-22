@@ -240,43 +240,15 @@ do
 			end
 			
 			self.collisionActive = active
+			
+			if not active then
+				self.collidesTo = {}
+			end
 		end
 		
+		World:setCounter("chunks_collide", self.collisionActive and 1 or -1, true)
+		
 		return self.collisionActive
-	end
-	
-	--- Sets the Collisions for the Chunk.
-	-- This is just an interface function that manages the interactions between
-	-- players and the Chunk, to ensure no innecessary calls for players that had
-	-- the Chunk already loaded.
-	-- @name Chunk:setCollisions
-	-- @param Boolean|Nil:active Sets the collision state. If nil then a reload will be performed for all players
-	-- @param String|Nil:targetPlayer The target that asks for the collision update. If nil then player check wont be accounted
-	-- @return `Boolean` Whether the specified action happened or not
-	function Chunk:setCollisions(active, targetPlayer)
-		if active == nil then
-			self:setCollisions(false, nil)
-			self:setCollisions(true, nil)
-			
-			return true
-		else
-			local goAhead = false
-			if targetPlayer and active then
-				goAhead = (not self.collidesTo[targetPlayer] == active)
-				self.collidesTo[targetPlayer] = active
-			else
-				goAhead = true
-				self.collidesTo = copykeys(Room.presencePlayerList, not not active)
-			end
-			
-			if goAhead then
-				self:setPhysicState(active)
-			end
-			
-			self:setUnloadDelay(240, "physics")
-			
-			return goAhead
-		end
 	end
 	
 	--- Recalculates the collisions of the given segments, or the whole chunk.
@@ -299,7 +271,6 @@ do
 		end
 		
 		local xStart, yStart, xEnd, yEnd, category
-		
 		for segmentId, _ in next, segmentList do
 			xStart, yStart, xEnd, yEnd, category = self:deleteSegment(segmentId)
 			if xStart and yStart and xEnd and yEnd and category then
@@ -314,7 +285,7 @@ do
 			end
 		end
 		
-		local list = self:getCollisions(mode, xs, ys, xe, ye, catlist)
+		local list = self:getCollisions(mode, xs, xe, ys, ye, catlist)
 		
 		if update then
 			self:setPhysicState(true, list)

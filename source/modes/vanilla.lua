@@ -1,14 +1,12 @@
-Module:newMode("default", function(this, g)
+Module:newMode("vanilla", function(this, g)
 	function this:init(world)
-		world:setVariables(32, 32, 16, 16, 2, 4, 0, 200)
+		world:setVariables(64, 32, 12, 8, 80, 18, 0, 200)
 		world:setPhysicsMode("rectangle_detailed")
 	end
 	
 	function this:setWorld(field)
-		local l = {32}
-		for i=2, 64 do
-			l[i] = l[i-1] + (math.random(-1, 1))
-		end
+		local heightMap = math.heightMap(32, 24, 960, 80, nil, 144, true)
+		
 		
 		field:setLayer({
 			overwrite = true,
@@ -18,7 +16,7 @@ Module:newMode("default", function(this, g)
 				[2] = {type = 1, tangible = true},
 				[6] = {type = 20, tangible = true},
 			}
-		}, l)
+		}, heightMap)
 	end
 	
 	function this:run()

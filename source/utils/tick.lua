@@ -126,10 +126,10 @@ do
 			
 			queue = function(this, taskId)
 				this.counter = this.counter + 1
-				this.tasks[taskId] = true
-				
-				this.pending = this.pending + 1
-				
+				if not this.tasks[taskId] then
+					this.tasks[taskId] = true
+					this.pending = this.pending + 1
+				end
 		
 				return this.counter
 			end,
@@ -145,6 +145,7 @@ do
 			execute = function(this)
 				this.runtimeLapse = 0
 				local list = copy(this.tasks)
+				
 				local startTime = 0
 				local task
 				
@@ -156,6 +157,9 @@ do
 					if task then
 						task:execute()
 						this:pop(taskId)
+					else
+						this.pending = this.pending - 1
+						this.tasks[taskId] = nil
 					end
 					
 					this.runtimeLapse = time() - startTime
@@ -258,8 +262,20 @@ do
 		end
 		
 		if completed then
+			self.halted = 0
+			
+			self.lastTick = time() - self.lastTickTimestamp 
+			self.lastTickTimestamp = time()
+			
 			self.slice:remove(self.current)
+			
 			self:step(1)
+		else
+			self.halted = self.halted + 1
+			
+			if self.halted >= 20 then -- The tick system is being halted
+				self.slice:remove(self.current)
+			end
 		end
 		
 		return completed

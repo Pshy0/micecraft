@@ -66,14 +66,19 @@ local fileList = {
 		__docs = true,
 		"init",
 		"physics",
-		"graphics"
+		"graphics",
+		"management",
+		"queue"
 	},
 	[8] = {
 		__name = "Player",
 		__directory = "source/player",
 		__docs = true,
 		"init",
-		"data"
+		"data",
+		"update",
+		"handle",
+		"world"
 	},
 	[9] = {
 		__name = "MetaData",
@@ -87,7 +92,7 @@ local fileList = {
 		__directory = "source/modes",
 		__docs = false,
 		"init",
-		"default"
+		"vanilla"
 	},
 	[11] = {
 		__name = "Events",
@@ -95,10 +100,13 @@ local fileList = {
 		__docs = false,
 		"Loop",
 		"NewGame",
+		"ContactListener",
 		"NewPlayer",
 		"PlayerDataLoaded",
 		"PlayerLeft",
-		"Mouse"
+		"Mouse",
+		"Keyboard",
+		"PlayerDied"
 	},
 	[12] = {
 		__name = "Launch",

@@ -60,6 +60,7 @@ function World:initChunks()
 			)
 			
 			self.chunks[y][x]:getCollisions(self.physicsMode)
+			self.chunkLookup[chunkId] = {x=x, y=y}
 		end
 	end
 end

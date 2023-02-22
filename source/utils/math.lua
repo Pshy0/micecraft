@@ -154,9 +154,9 @@ do
 	-- @return `Table` An array that contains each point of the height map.
 	local cosint = math.cosint
 	local restrict = math.restrict
-	math.heightMap = function(amplitude, waveLenght, width, offset, lower, higher)
+	math.heightMap = function(amplitude, waveLenght, width, offset, lower, higher, truncate)
 		lower = lower or 0
-		higher = higher or amplitude
+		higher = higher or amplitude + offset
 		local heightMap = {}
 		local a, b = random(), random()
 		
@@ -166,12 +166,16 @@ do
 			if x % waveLenght == 0 then
 				a = b
 				b = random()
-				y = a * amplitude
+				y = (a * amplitude)
 			else
 				y = cosint(a, b, (x % waveLenght) / waveLenght) * amplitude
 			end
 			
 			heightMap[x + 1] = restrict(y + offset, lower, higher)
+			
+			if truncate then
+				heightMap[x + 1] = math.round(heightMap[x + 1])
+			end
 			
 			x = x + 1
 		end

@@ -26,6 +26,9 @@ function Chunk:new(uniqueId, x, y, width, height, xFact, yFact, dx, dy, biome)
 		blockWidth = blockWidth,
 		blockHeight = blockHeight,
 		
+		dx = dx,
+		dy = dy,
+		
 		xf = xFact, -- X Start
 		yf = yFact, -- Y Start
 		
@@ -41,7 +44,8 @@ function Chunk:new(uniqueId, x, y, width, height, xFact, yFact, dx, dy, biome)
 		displayTimer=  -1,
 		
 		segments = {},
-		items = {}
+		items = {},
+		debugImageId = -1
 	}, self)
 
 	this.__index = self
@@ -62,31 +66,4 @@ function Chunk:new(uniqueId, x, y, width, height, xFact, yFact, dx, dy, biome)
 	end
 	
 	return this
-end
-
---- Sets the Time that the Chunk should wait before unloading.
--- There are three options to pick: physics, graphics, items.
--- Note: Items unload removes them permanently.
--- @name Chunk:setUnloadDelay
--- @param Int:ticks How many ticks should the Chunk await
--- @param String:type The type of unload
--- @return `Boolean` Whether the unload scheduling was successful or not.
-function Chunk:setUnloadDelay(ticks, type)
-	if type == "physics" then
-		Tick:removeTask(self.collisionTimer)
-		self.collisionTimer = Tick:newTask(ticks, false, function()
-			self:setCollisions(false, nil)
-		end)
-	
-		return (not not self.collisionTimer)
-	elseif type == "graphics" then
-		Tick:removeTask(self.displayTimer)
-		self.displayTimer = Tick:newTask(ticks, false, function()
-			self:setDisplay(false, nil)
-		end)
-	
-		return (not not self.displayTimer)
-	end
-	
-	return false
 end

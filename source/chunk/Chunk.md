@@ -24,20 +24,6 @@ Creates a new Chunk object. A chunk can hold information about blocks and items 
 
 ---
 
-### **Chunk:setUnloadDelay** ( `ticks`: int, `type`: string )
-Sets the Time that the Chunk should wait before unloading. There are three options to pick: physics, graphics, items. Note: Items unload removes them permanently.
-
-
-**Parameters:**
-- **ticks** (`Int`) : How many ticks should the Chunk await
-- **type** (`String`) : The type of unload
-
-
-**Returns:**
-- `Boolean` Whether the unload scheduling was successful or not.
-
----
-
 ### **Chunk:setSegment** ( `description`: table )
 Creates a new Segment object, with the description provided 
 
@@ -96,20 +82,6 @@ Sets the state for the physics of the Chunk or some of its segments.
 
 ---
 
-### **Chunk:setCollisions** ( `active`: boolean|nil, `targetPlayer`: string|nil )
-Sets the Collisions for the Chunk. This is just an interface function that manages the interactions between players and the Chunk, to ensure no innecessary calls for players that had the Chunk already loaded.
-
-
-**Parameters:**
-- **active** (`Boolean|Nil`) : Sets the collision state. If nil then a reload will be performed for all players
-- **targetPlayer** (`String|Nil`) : The target that asks for the collision update. If nil then player check wont be accounted
-
-
-**Returns:**
-- `Boolean` Whether the specified action happened or not
-
----
-
 ### **Chunk:refreshPhysics** ( `mode`: string, `segmentList`: table, `update`: boolean, `origin`: table )
 Recalculates the collisions of the given segments, or the whole chunk. 
 
@@ -133,6 +105,34 @@ Sets the display state of a Chunk. When active, all blocks corresponding to this
 
 **Parameters:**
 - **active** (`Boolean`) : Whether it should be active or not
+
+---
+
+### **Chunk:setUnloadDelay** ( `ticks`: int, `type`: string )
+Sets the Time that the Chunk should wait before unloading. There are three options to pick: physics, graphics, items. Note: Items unload removes them permanently.
+
+
+**Parameters:**
+- **ticks** (`Int`) : How many ticks should the Chunk await
+- **type** (`String`) : The type of unload
+
+
+**Returns:**
+- `Boolean` Whether the unload scheduling was successful or not.
+
+---
+
+### **Chunk:setCollisions** ( `active`: boolean|nil, `targetPlayer`: string|nil )
+Sets the Collisions for the Chunk. This is just an interface function that manages the interactions between players and the Chunk, to ensure no innecessary calls for players that had the Chunk already loaded.
+
+
+**Parameters:**
+- **active** (`Boolean|Nil`) : Sets the collision state. If nil then a reload will be performed for all players
+- **targetPlayer** (`String|Nil`) : The target that asks for the collision update. If nil then player check wont be accounted
+
+
+**Returns:**
+- `Boolean` Whether the specified action happened or not
 
 ---
 

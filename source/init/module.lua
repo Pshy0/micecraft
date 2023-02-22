@@ -37,10 +37,10 @@ do
 	local misc = tfm.get.misc
 	function Module:assertVersion(apiVersion, tfmVersion)		
 		self.apiVersion = apiVersion or misc.apiVersion
-		self.tfmVersion = tfmVersion or misc.transformiceVersion
+		self.tfmVersion = tostring(tfmVersion or misc.transformiceVersion)
 		
 		local apiMatch = (self.apiVersion == misc.apiVersion)
-		local tfmMatch = (self.tfmVersion == misc.transformiceVersion)
+		local tfmMatch = (self.tfmVersion == tostring(misc.transformiceVersion))
 		
 		if not apiMatch then
 			self:emitWarning(3, "Module API version mismatch")
@@ -457,7 +457,7 @@ do
 	end
 	
 	function Module:setMode(modeName)
-		local mode = self:getMode(modeName) or self:getMode("default")
+		local mode = self:getMode(modeName) or self:getMode("vanilla")
 		
 		if mode then
 			mode:constructor({ -- Proxy table
@@ -473,7 +473,7 @@ do
 			self.settings = mode:getSettings()
 		end
 		
-		self.subMode = mode.name
+		self.subMode = mode.name or "unknown"
 		
 		return mode
 	end

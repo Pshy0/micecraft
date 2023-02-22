@@ -9,12 +9,13 @@ end
 
 
 function Field:assignTemplate(x, y, template)
+	local this = self[y][x]
 	if template.type ~= nil then
-		self[y][x].type = template.type
+		this.type = template.type
 	end
 	
 	if template.tangible ~= nil then
-		self[y][x].tangible = template.tangible
+		this.tangible = template.tangible
 	end
 end
 

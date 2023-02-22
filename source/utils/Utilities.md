@@ -235,6 +235,19 @@ Returns an array with all the keys/indexes from the given table.
 
 ---
 
+### **table.count** ( `t`: table )
+Counts all entries in a Table. 
+
+
+**Parameters:**
+- **t** (`Table`) : The table to count values on
+
+
+**Returns:**
+- `Int` The amount of entries
+
+---
+
 ### **table.copykeys** ( `t`: table, `v`: any )
 Copies all the keys from the table and assigns them the value given. 
 

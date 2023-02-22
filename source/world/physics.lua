@@ -100,7 +100,7 @@ do
 		return list
 	end
 	
-		function World.physicsMap:rectangle_detailed(xStart, xEnd, yStart, yEnd, catlist)
+	function World.physicsMap:rectangle_detailed(xStart, xEnd, yStart, yEnd, catlist)
 		local x, y = 0, 0
 		local xs, xe, ys, ye
 		local matches = 0

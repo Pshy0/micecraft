@@ -19,7 +19,14 @@ function Player:new(playerName)
 		isAlive = false,
 		isBanned = false,
 		
+		currentChunk = -1,
+		lastChunk = -1,
+		
 		keys = {},
+		
+		showDebugInfo = false,
+		
+		internalTime = 0,
 		
 		dataFile = "",
 		awaitingData = false

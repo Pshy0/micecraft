@@ -16,8 +16,9 @@ function Module:start()
 	mode:run()
 	
 	do
+		local spawn = World:getSpawn()
 		local width, height = World:getMapPixelDimensions()
-		tfm.exec.newGame(xmlLoad:format(width, height, width/2, height/2))
+		tfm.exec.newGame(xmlLoad:format(width, height, spawn.dx, spawn.dy))
 	end
 end
 
