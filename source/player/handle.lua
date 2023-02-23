@@ -68,14 +68,14 @@ do
 	local right = table.concat({
 		"Micecraft %s (%s/%s)", -- 2(version) + gameMode
 		"T: %d / %d (%d)", -- currentTick + halted + timeSinceLastTick
-		"C: c%d / g%d / i%d", -- Chunks with: collision active, graphics active, items active
+		"C: %d / %d / %d", -- Chunks with: collision active, graphics active, items active
 		"Q: %d", -- Chunks in queue
 		"E: %d", -- Number of total entities,
-		"P: c%d / t%d / p%d", -- Players currently playing, total players, unique players
+		"P: %d / %d / %d", -- Players currently playing, total players, unique players
 		"",
 		"GF: %f / %f", -- Gravity Forces (gravity/wind)
-		"M: x%d / y%d (t%d)", -- chunks in X, Y, AND in total
-		"m: x%d / y%d (t%d)", -- same but for blocks
+		"M: %d / %d (t%d)", -- chunks in X, Y, AND in total
+		"m: %d / %d (t%d)", -- same but for blocks
 		"",
  		"API: v%s / m%s", -- Module API version (currrent & module)
 		"TFM: v%s / m%s", -- Transformice version	""		""

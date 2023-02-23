@@ -169,6 +169,6 @@ do
 	end
 	
 	ChunkQueue.tickId = Tick:newTask(1, true, function()
-		ChunkQueue:step(2)
+		ChunkQueue:step(4)
 	end)
 end

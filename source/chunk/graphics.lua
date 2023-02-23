@@ -27,7 +27,7 @@ function Chunk:setDisplayState(active)
 	
 	self.displayActive = (active ~= false)
 	
-	World:setCounter("chunks_collide", self.displayActive and 1 or -1, true)
+	World:setCounter("chunks_display", self.displayActive and 1 or -1, true)
 	
 	return self.displayActive
 end

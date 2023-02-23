@@ -118,7 +118,7 @@ Interpolates two points with a cosine curve.
 ---
 
 ### **math.heightMap** ( `amplitude`: number, `waveLenght`: number, `width`: int, `offset`: number, `lower`: number, `higher`: number )
-Generates a Height Map based on the current `randomseed`. 
+Generates a Height Map based on the current `random seed`. 
 
 
 **Parameters:**
@@ -132,6 +132,11 @@ Generates a Height Map based on the current `randomseed`.
 
 **Returns:**
 - `Table` An array that contains each point of the height map.
+
+---
+
+### **nil** (  )
+Combines two Height maps based on the operation provided. The built-in operations are: `sum`, `sub`, `mul`, `div`.
 
 ---
 

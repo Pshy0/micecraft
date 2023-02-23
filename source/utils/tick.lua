@@ -230,7 +230,7 @@ do
 	-- @name Tick:removeTask
 	-- @param Int:taskId The identifier of the Task
 	function Tick:removeTask(taskId)
-		self.taskList[taskId] = nil
+		self.taskList[taskId or -1] = nil
 	end
 	
 	--- Sets a new time for the specified Task.

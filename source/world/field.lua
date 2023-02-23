@@ -23,32 +23,54 @@ function Field:setLayer(layer, heightMap)
 	local width, height = World:getBlocks()
 	local dir = layer.dir
 	local overwrite = layer.overwrite
-	local isExclusive = layer.exclusive
 	
-	local ys = math.max(dir.min or 1, 1) -- Y Start
-	local ye = math.min(dir.max or height, height) -- Y End
+	local minc, maxc, start
 	
 	local template = dir[1]
 	local depth = 1
 	
-	local hmys -- Height Map Y Start
-	
-	for x = 1, width do
-		depth = 1
-		template = dir[depth]
-		hmys = (heightMap and heightMap[x] or 1)
-		for y = math.max(ys, hmys), ye do
-			template = dir[depth] or template
-			
-			if template.type == -1 then
-				break
+	if layer.vertical then
+		minc = math.max(dir.min or 1, 1) -- Y Start
+		maxc = math.min(dir.max or width, width) -- Y End
+		
+		for y = 1, height do
+			depth = 1
+			template = dir[depth]
+			start = (heightMap and heightMap[y] or 1)
+			for x = math.max(minc, start), maxc do
+				template = dir[depth] or template
+				
+				if template.type == -1 then
+					break
+				end
+				
+				if overwrite or self[y][x].type == 0 then
+					self:assignTemplate(x, y, template)
+				end
+				
+				depth = depth + 1
 			end
-			
-			if overwrite or self[y][x].type == 0 then
-				self:assignTemplate(x, y, template)
+		end
+	else
+		minc = math.max(dir.min or 1, 1) -- Y Start
+		maxc = math.min(dir.max or height, height) -- Y End
+		for x = 1, width do
+			depth = 1
+			template = dir[depth]
+			start = (heightMap and heightMap[x] or 1)
+			for y = math.max(minc, start), maxc do
+				template = dir[depth] or template
+				
+				if template.type == -1 then
+					break
+				end
+				
+				if overwrite or self[y][x].type == 0 then
+					self:assignTemplate(x, y, template)
+				end
+				
+				depth = depth + 1
 			end
-			
-			depth = depth + 1
 		end
 	end
 end

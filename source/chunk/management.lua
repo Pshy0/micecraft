@@ -144,29 +144,40 @@ do
 			ap(list, self)
 		end
 		
+		local xx = self.x
+		local yy = self.y
+		
 		if mode == "special" then -- Order matters
-			ap(list, world:getChunk(self.x + 1, self.y, "matrix"))
-			ap(list, world:getChunk(self.x - 1, self.y, "matrix"))
-			ap(list, world:getChunk(self.x, self.y + 1, "matrix"))
-			ap(list, world:getChunk(self.x, self.y - 1, "matrix"))
-			ap(list, world:getChunk(self.x - 1, self.y + 1, "matrix"))
-			ap(list, world:getChunk(self.x + 1, self.y + 1, "matrix"))
-			ap(list, world:getChunk(self.x + 1, self.y - 1, "matrix"))
-			ap(list, world:getChunk(self.x - 1, self.y - 1, "matrix"))
+			local p1x = xx + 1
+			local s1x = xx - 1
+			local p1y = yy + 1
+			local s1y = yy - 1
+			ap(list, world:getChunk(p1x, yy, "matrix"))
+			ap(list, world:getChunk(s1x, yy, "matrix"))
+			ap(list, world:getChunk(xx, p1y, "matrix"))
+			ap(list, world:getChunk(xx, s1y, "matrix"))
+			
+			ap(list, world:getChunk(s1x, p1y, "matrix"))
+			ap(list, world:getChunk(p1x, p1y, "matrix"))
+			ap(list, world:getChunk(p1x, s1y, "matrix"))
+			ap(list, world:getChunk(s1x, s1y, "matrix"))
+			
+			ap(list, world:getChunk(p1x + 1, yy, "matrix"))
+			ap(list, world:getChunk(s1x - 1, yy, "matrix"))
+			ap(list, world:getChunk(p1x + 1, s1y, "matrix"))
+			ap(list, world:getChunk(s1x - 1, p1y, "matrix"))
+			
+			ap(list, world:getChunk(xx, p1y + 1, "matrix"))
 		elseif mode == "cross" then
-			ap(list, world:getChunk(self.x - 1, self.y, "matrix"))
-			ap(list, world:getChunk(self.x, self.y - 1, "matrix"))
-			ap(list, world:getChunk(self.x + 1, self.y, "matrix"))
-			ap(list, world:getChunk(self.x, self.y + 1, "matrix"))
+			ap(list, world:getChunk(xx - 1, yy, "matrix"))
+			ap(list, world:getChunk(xx, yy - 1, "matrix"))
+			ap(list, world:getChunk(xx + 1, yy, "matrix"))
+			ap(list, world:getChunk(xx, yy + 1, "matrix"))
 		elseif mode == "square" then
 			for y = -1, 1 do
 				for x=-1, 1 do
 					if not (x == 0 and y == 0) then
-						ap(list, world:getChunk(
-							self.x+x,
-							self.y+y,
-							"matrix"
-						))
+						ap(list, world:getChunk(xx + x, yy + y, "matrix"))
 					end
 				end
 			end

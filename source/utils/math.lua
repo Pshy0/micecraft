@@ -143,7 +143,7 @@ do
 		return (a * (1 - f)) + (b * f)
 	end
 	
-	--- Generates a Height Map based on the current `randomseed`.
+	--- Generates a Height Map based on the current `random seed`.
 	-- @name math.heightMap
 	-- @param Number:amplitude How tall can a wave be
 	-- @param Number:waveLenght How wide will a wave be
@@ -181,6 +181,57 @@ do
 		end
 		
 		return heightMap
+	end
+	
+	do
+		local op = {
+			add = function(a, b)
+				return a + b
+			end,
+			sub = function(a, b)
+				return a - b
+			end,
+			mul = function(a, b)
+				return a * b
+			end,
+			div = function(a, b)
+				return a / b
+			end,
+			overwrite = function(a, b)
+				return b
+			end
+		}
+		
+		--- Combines two Height maps based on the operation provided.
+		-- The built-in operations are: `sum`, `sub`, `mul`, `div`.
+		-- @name math.combineMaps
+		-- @param Table:a The first map
+		-- @param Table:b The second map
+		-- @param String|Function:operation The operation to do. If the type is function, the structure needed is: `function(a, b)` and must return Int.
+		-- @param Int:start In which part should it start the operation onto the first array (default = 1)
+		-- @param Int:finish In which part should it stop (default = min of #a and #b)
+		-- @param Int:offset Offset from map 2
+		-- @return `Table` A Height Map with the processed operation
+		math.combineMaps = function(a, b, operation, start, finish, offset)
+			local newMap = table.copy(a)
+			start = start or math.max(1, start or 1)
+			finish = finish or math.min(#a, #b)
+			offset = offset or 0
+			
+			operation = operation or "add"
+			local f
+			if type(operation) == "function" then
+				f = operation
+			else
+				f = op[operation] or op.add
+			end
+			
+			for i = start, finish do
+				newMap[i] = f(a[i], b[i + offset])
+			end
+		
+			return newMap
+		end
 	end
 	
 	--- Stretches a height map, or array with numerical values.

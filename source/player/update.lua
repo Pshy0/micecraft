@@ -62,7 +62,7 @@ do
 	
 	function Player:setClock(time, add, runEvents)
 		time = time or (add and 500 or self.internalTime)
-		self.internalTime = (add and self.internalTime + time) or time
+		self.internalTime = (add and self.internalTime + time or time)
 
 		if runEvents then
 			if self.internalTime % 1000 == 0 then
@@ -70,9 +70,11 @@ do
 					self:updateChunkArea()
 				end
 				
-				if self.showDebugInfo then
-					self:setDebugInformation(true)
-				end
+				
+			end
+			
+			if self.showDebugInfo then
+				self:setDebugInformation(true)
 			end
 		end
 	end

@@ -16,15 +16,6 @@ end
 
 Module:on("Loop", function(elapsedTime, remainingTime)
 	Tick:handle()
-	ui.addTextArea(
-		0,
-		("<font color='#FFFFFF'><p align='right'>%d"):format(Tick.current),
-		nil,
-		595, 25,
-		200, 0,
-		0x0, 0x0,
-		1.0, true
-	)
 end)
 
 Module:on("Loop", function(elapsedTime, remainingTime)

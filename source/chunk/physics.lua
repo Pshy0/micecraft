@@ -163,8 +163,8 @@ do
 	end
 	
 	--- Deletes a Segment from the Chunk.
-	-- All blocks for which this Segment was attached will be deattached and
-	-- their physic state will be reset.
+	-- All blocks for which this Segment was attached will be deattached
+	-- and their physic state will be reset.
 	-- @name Chunk:deleteSegment
 	-- @param Int:segmentId The identifier of the Segment
 	-- @return `Int` The left-most block coordinate of the Segment
@@ -185,8 +185,8 @@ do
 	end
 	
 	--- Gets the collisions from a Chunk.
-	-- For blocks that don't have a segment assigned, it will calculate their
-	-- collisions and assign them a new Segment.
+	-- For blocks that don't have a segment assigned, it will calculate
+	-- their collisions and assign them a new Segment.
 	-- @name Chunk:getCollisions
 	-- @param String:mode The coordinate calculation mode
 	-- @param Int:xStart The left-most block coordinates to calculate
@@ -293,8 +293,8 @@ do
 	end
 	
 	--- Empties a Chunk.
-	-- All blocks from this Chunk will become **void**, their displays will be hidden and it
-	-- will not have collisions.
+	-- All blocks from this Chunk will become **void**, their displays
+	-- will be hidden and it will not have collisions.
 	-- @name Chunk:clear
 	function Chunk:clear()
 		local matrix = World.blocks
